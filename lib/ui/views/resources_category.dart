@@ -28,8 +28,9 @@ class ResourcesCategory extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>
-                            Resources(category: programs.keys.toList()[index]),
+                        builder: (BuildContext context) => Resources(
+                            categoryKey: programs.keys.toList()[index],
+                            categoryValue: programs.values.toList()[index]),
                       ),
                     ),
                   ));

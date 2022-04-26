@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'routes.dart';
 
 Map<String, String> programs = {
@@ -15,7 +16,10 @@ Map<String, String> drawerItems = {
 };
 
 List<String> subtitle = [
-  'Personal Information',
+  'Personal Information 1',
+  'Personal Information 2',
   'Demographics',
   'Work Information'
 ];
+
+Map<String, TextEditingController> textEditingControllers = {};

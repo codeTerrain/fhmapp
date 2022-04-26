@@ -137,7 +137,7 @@ class Dots extends StatelessWidget {
 
   Future<void> animateScroll(int page) async {
     await pageController.animateToPage(
-      max(min(page, 3), 0),
+      max(min(page, 4), 0),
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeIn,
     );
@@ -146,11 +146,11 @@ class Dots extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: "Page ${currentPage.round() + 1} of 3",
+      label: "Page ${currentPage.round() + 1} of 4",
       excludeSemantics: true,
       child: DotsIndicator(
         // reversed: widget.rtl,
-        dotsCount: 3,
+        dotsCount: 4,
         position: currentPage,
         onTap: (pos) => animateScroll(pos.toInt()),
         decorator: const DotsDecorator(

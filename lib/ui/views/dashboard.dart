@@ -27,7 +27,7 @@ class Dashboard extends StatelessWidget {
           ),
           //),
         ]),
-        const Positioned(top: 65, child: TagChips()),
+        //  const Positioned(top: 65, child: TagChips()),
       ],
     );
   }

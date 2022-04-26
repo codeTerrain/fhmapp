@@ -6,6 +6,7 @@ import '../shared/Routes.dart';
 import '../shared/spacing.dart';
 import '../shared/static_lists.dart';
 import '../shared/style.dart';
+import '../shared/validator.dart';
 import '../widgets/buttons.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/dots.dart';
@@ -13,34 +14,52 @@ import '../widgets/dots.dart';
 class SignUp extends StatelessWidget {
   SignUp({Key? key}) : super(key: key);
 
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _districtController = TextEditingController();
+  final TextEditingController _subDistrictController = TextEditingController();
+  final TextEditingController _facilityController = TextEditingController();
+  final TextEditingController _communityController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _cadreController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   final PageController pageController = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: kWhite,
-        body: ListView(
-          physics: scrollPhysics,
-          children: [
-            SizedBox(
-              height: UiSpacing.screenSize(context).height,
-              child: PageView.builder(
-                  controller: pageController,
-                  itemCount: 3,
-                  itemBuilder: (context, index) => Column(
-                        children: [
-                          SignBuilder(
-                            pageController: pageController,
-                            currentPage: index.toDouble(),
-                            mainTitle: 'STEP ${index + 1}',
-                            subTitle: subtitle[index],
-                            widget: fields(context, index, controller),
-                            trailingWidget: trailingWidget(context, index),
-                          ),
-                        ],
-                      )),
-            ),
-          ],
+        body: SizedBox(
+          height: UiSpacing.screenSize(context).height,
+          child: PageView.builder(
+              controller: pageController,
+              itemCount: 4,
+              itemBuilder: (context, index) => SignBuilder(
+                    formKey: formKey,
+                    pageController: pageController,
+                    currentPage: index.toDouble(),
+                    mainTitle: 'STEP ${index + 1}',
+                    subTitle: subtitle[index],
+                    widget: fields(context, index,
+                        cadreController: _cadreController,
+                        communityController: _communityController,
+                        confirmPasswordController: _confirmPasswordController,
+                        districtController: _districtController,
+                        dobController: _dobController,
+                        emailController: _emailController,
+                        facilityController: _facilityController,
+                        firstNameController: _firstNameController,
+                        lastNameController: _lastNameController,
+                        passwordController: _passwordController,
+                        phoneController: _phoneController,
+                        subDistrictController: _subDistrictController),
+                    trailingWidget: trailingWidget(context, index),
+                  )),
         ));
   }
 }
@@ -52,10 +71,13 @@ class SignBuilder extends StatelessWidget {
   final Widget trailingWidget;
   final double currentPage;
   final PageController pageController;
+  final GlobalKey<FormState> formKey;
+
   const SignBuilder(
       {Key? key,
       required this.mainTitle,
       required this.subTitle,
+      required this.formKey,
       required this.currentPage,
       required this.pageController,
       this.widget,
@@ -71,73 +93,84 @@ class SignBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      physics: scrollPhysics,
       child: Center(
         child: SizedBox(
           width: UiSpacing.screenSize(context).width / 1.15,
-          height: UiSpacing.screenSize(context).height,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SafeArea(
-                child: Padding(
-                    padding: const EdgeInsets.only(top: 80, right: 16),
-                    child: Image.asset(
-                      'assets/images/logos/ghs_logo.png',
-                      scale: 3,
-                    )),
-              ),
-              UiSpacing.verticalSpacingLarge(),
-              Text(
-                mainTitle,
-                style: Theme.of(context).textTheme.headline1,
-              ),
-              UiSpacing.verticalSpacingTiny(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  descriptiveText(
-                    context,
-                    subTitle,
-                  ),
-                  Dots(
-                    currentPage: currentPage,
-                    pageController: pageController,
-                  )
-                ],
-              ),
-              UiSpacing.verticalSpacingLarge(),
-              ...?widget,
-              UiSpacing.verticalSpacingSmall(),
-              trailingWidget,
-              UiSpacing.verticalSpacingSmall(),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  currentPage != 0
-                      ? IconButton(
-                          onPressed: () => pageController.previousPage(
+          //height: UiSpacing.screenSize(context).height,
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SafeArea(
+                  child: Padding(
+                      padding: const EdgeInsets.only(top: 80, right: 16),
+                      child: Image.asset(
+                        'assets/images/logos/ghs_logo.png',
+                        scale: 3,
+                      )),
+                ),
+                UiSpacing.verticalSpacingLarge(),
+                Text(
+                  mainTitle,
+                  style: Theme.of(context).textTheme.headline1,
+                ),
+                UiSpacing.verticalSpacingTiny(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    descriptiveText(
+                      context,
+                      subTitle,
+                    ),
+                    Dots(
+                      currentPage: currentPage,
+                      pageController: pageController,
+                    )
+                  ],
+                ),
+                UiSpacing.verticalSpacingLarge(),
+                ...?widget,
+                UiSpacing.verticalSpacingSmall(),
+                trailingWidget,
+                UiSpacing.verticalSpacingLarge(),
+                //const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    currentPage != 0
+                        ? IconButton(
+                            onPressed: () => pageController.previousPage(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeOut),
+                            icon: Image.asset(
+                              'assets/images/onboarding/back.png',
+                              color: kBlack,
+                              scale: 3,
+                            ),
+                          )
+                        : const SizedBox(),
+                    RoundedButtonTheme(
+                      width: 100,
+                      text: currentPage != 3 ? 'Next' : 'Register',
+                      buttonColor: kBlack,
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          formKey.currentState?.save();
+
+                          FocusScope.of(context).requestFocus(FocusNode());
+                          return pageController.nextPage(
                               duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeOut),
-                          icon: Image.asset(
-                            'assets/images/onboarding/back.png',
-                            color: kBlack,
-                            scale: 3,
-                          ),
-                        )
-                      : const SizedBox(),
-                  RoundedButtonTheme(
-                    width: 100,
-                    text: currentPage != 2 ? 'Next' : 'Register',
-                    buttonColor: kBlack,
-                    onPressed: () => pageController.nextPage(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOut),
-                  ),
-                ],
-              ),
-              UiSpacing.verticalSpacingLarge(),
-            ],
+                              curve: Curves.easeOut);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                UiSpacing.verticalSpacingLarge(),
+              ],
+            ),
           ),
         ),
       ),
@@ -165,6 +198,7 @@ Widget trailingWidget(BuildContext context, index) {
       ),
     ),
     const SizedBox(),
+    const SizedBox(),
     RichText(
       text: TextSpan(
         text: 'By signing up, you agree to the ',
@@ -190,56 +224,96 @@ Widget trailingWidget(BuildContext context, index) {
   return widgets[index];
 }
 
-List<Widget> fields(
-    BuildContext context, index, TextEditingController controller) {
+List<Widget> fields(BuildContext context, index,
+    {required TextEditingController firstNameController,
+    required TextEditingController lastNameController,
+    required TextEditingController dobController,
+    required TextEditingController emailController,
+    required TextEditingController phoneController,
+    required TextEditingController passwordController,
+    required TextEditingController districtController,
+    required TextEditingController subDistrictController,
+    required TextEditingController facilityController,
+    required TextEditingController cadreController,
+    required TextEditingController communityController,
+    required TextEditingController confirmPasswordController}) {
   List<List<Widget>> stepList = [
     [
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: firstNameController,
         hintText: 'First Name',
         prefixIcon: Image.asset('assets/images/login/user.png'),
       ),
       UiSpacing.verticalSpacingSmall(),
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: lastNameController,
         hintText: 'Last Name',
         prefixIcon: Image.asset('assets/images/login/user.png'),
       ),
       UiSpacing.verticalSpacingSmall(),
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
-        hintText: 'E-mail',
+        controller: phoneController,
+        hintText: 'Gender',
         prefixIcon: Image.asset('assets/images/login/email.png'),
+        validator: (input) => Validator.isValidEmail(input),
       ),
       UiSpacing.verticalSpacingSmall(),
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
-        hintText: 'Password',
-        prefixIcon: Image.asset('assets/images/login/password.png'),
+        controller: emailController,
+        hintText: 'Phone',
+        prefixIcon: Image.asset('assets/images/login/email.png'),
+        validator: (input) => Validator.isValidEmail(input),
       ),
     ],
     [
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: emailController,
+        hintText: 'E-mail',
+        prefixIcon: Image.asset('assets/images/login/email.png'),
+        validator: (input) => Validator.isValidEmail(input),
+      ),
+      UiSpacing.verticalSpacingSmall(),
+      CustomTextField(
+        width: UiSpacing.screenSize(context).width,
+        controller: passwordController,
+        hintText: 'Password',
+        obscureText: true,
+        prefixIcon: Image.asset('assets/images/login/password.png'),
+        validator: (input) => Validator.isValidPassword(input),
+      ),
+      UiSpacing.verticalSpacingSmall(),
+      CustomTextField(
+        width: UiSpacing.screenSize(context).width,
+        controller: confirmPasswordController,
+        hintText: 'Confirm Password',
+        prefixIcon: Image.asset('assets/images/login/password.png'),
+        obscureText: true,
+        validator: (input) => Validator.isValidPassword(input),
+      ),
+    ],
+    [
+      CustomTextField(
+        width: UiSpacing.screenSize(context).width,
+        controller: districtController,
         hintText: 'Region',
         prefixIcon: Image.asset('assets/images/login/region.png'),
       ),
       UiSpacing.verticalSpacingSmall(),
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: districtController,
         hintText: 'District',
         prefixIcon: Image.asset('assets/images/login/district.png'),
       ),
       UiSpacing.verticalSpacingSmall(),
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: subDistrictController,
         hintText: 'Sub-District',
         prefixIcon: Image.asset('assets/images/login/subDistrict.png'),
       ),
@@ -248,14 +322,14 @@ List<Widget> fields(
     [
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: cadreController,
         hintText: 'Cadre',
         prefixIcon: Image.asset('assets/images/login/cadre.png'),
       ),
       UiSpacing.verticalSpacingSmall(),
       CustomTextField(
         width: UiSpacing.screenSize(context).width,
-        controller: controller,
+        controller: facilityController,
         hintText: 'Facility',
         prefixIcon: Image.asset('assets/images/login/facility.png'),
       ),

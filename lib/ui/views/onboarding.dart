@@ -53,7 +53,7 @@ class _OnboardingState extends State<Onboarding> {
                     child: RoundedButtonTheme(
                         text: 'Skip',
                         onPressed: () => Navigator.of(context)
-                            .push(createRoute(page: Login()))))),
+                            .push(createRoute(page: const Login()))))),
           ),
         ),
         pages: [

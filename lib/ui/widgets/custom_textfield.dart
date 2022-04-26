@@ -4,12 +4,13 @@ import 'package:fhmapp/ui/shared/style.dart';
 class CustomTextField extends StatefulWidget {
   final String hintText;
   final bool enabled;
+  final bool obscureText;
   final TextEditingController controller;
   final TextInputType keyboardType;
   final Color color;
-  final Function(String?)? onsaved;
-  final Function(String)? onChanged;
-  final String? Function(String?)? validation;
+  final FormFieldSetter<String>? onsaved;
+  final FormFieldSetter<String>? onChanged;
+  final FormFieldValidator<String>? validator;
   final int? maxLines;
   final double height;
   final double width;
@@ -20,6 +21,7 @@ class CustomTextField extends StatefulWidget {
       required this.controller,
       this.keyboardType = TextInputType.text,
       this.onsaved,
+      this.obscureText = false,
       this.onChanged,
       this.enabled = true,
       this.color = kWhite,
@@ -27,7 +29,7 @@ class CustomTextField extends StatefulWidget {
       this.width = 300,
       this.maxLines,
       this.prefixIcon,
-      this.validation})
+      this.validator})
       : super(key: key);
 
   @override
@@ -54,14 +56,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         enabled: widget.enabled,
         keyboardType: widget.keyboardType,
         controller: widget.controller,
-        obscureText: (widget.hintText == "Password" ||
-                widget.hintText == "Create New Password" ||
-                widget.hintText == "Re-type your Password" ||
-                widget.hintText == "Re-type New Password")
-            ? _obscureText
-            : false,
+        obscureText: widget.obscureText ? _obscureText : false,
         onSaved: widget.onsaved,
-        validator: widget.validation,
+        validator: widget.validator,
         decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle:
@@ -73,10 +70,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               borderSide: BorderSide(color: secondary1, width: 2.0),
             ),
             prefixIcon: widget.prefixIcon,
-            suffixIcon: (widget.hintText == "Password" ||
-                    widget.hintText == "Create New Password" ||
-                    widget.hintText == "Re-type your Password" ||
-                    widget.hintText == "Re-type New Password")
+            suffixIcon: widget.obscureText
                 ? IconButton(
                     onPressed: () {
                       _toggle();

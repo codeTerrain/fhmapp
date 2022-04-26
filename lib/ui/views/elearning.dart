@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/appbars.dart';
 import '../widgets/misc.dart';
+import 'course.dart';
 
 class ELearning extends StatelessWidget {
   const ELearning({Key? key}) : super(key: key);
@@ -30,74 +31,99 @@ class ELearning extends StatelessWidget {
                 color: kWhite,
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: kBlack,
-                            borderRadius: BorderRadius.circular(10),
-                            image: const DecorationImage(
-                                image: AssetImage(
-                                  'assets/images/dashboard/dummyFamily.png',
-                                ),
-                                fit: BoxFit.cover)),
-                        height: 120,
-                        width: 130,
-                      ),
-                      SizedBox(
-                        height: 120,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Resource',
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
-                            UiSpacing.verticalSpacingTiny(),
-                            programmeTag(
-                              context,
-                              text: 'Adolescent Health',
-                              margin: 0,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3
-                                  ?.copyWith(
-                                      color: kWhite,
-                                      fontWeight: FontWeight.bold),
-                            ),
-                            UiSpacing.verticalSpacingTiny(),
-                            Text(
-                              'Description',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1
-                                  ?.copyWith(color: grey),
-                            ),
-                            const Spacer(),
-                            Text(
-                              'Duration: 2hr 30mins',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3
-                                  ?.copyWith(color: grey),
-                            ),
-                          ],
+                  child: SizedBox(
+                    width: UiSpacing.screenSize(context).width,
+                    child: Row(
+                      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: kBlack,
+                              borderRadius: BorderRadius.circular(10),
+                              image: const DecorationImage(
+                                  image: AssetImage(
+                                    'assets/images/dashboard/dummyFamily.png',
+                                  ),
+                                  fit: BoxFit.cover)),
+                          height: 120,
+                          width: 130,
                         ),
-                      ),
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: primaryColor,
-                        child: IconButton(
-                          onPressed: null,
-                          icon: Icon(
-                            Icons.video_library,
-                            color: kWhite,
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Column(
+                                //mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Resource',
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  ),
+                                  UiSpacing.verticalSpacingTiny(),
+                                  programmeTag(
+                                    context,
+                                    text: 'Adolescent Health',
+                                    margin: 0,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3
+                                        ?.copyWith(
+                                            color: kWhite,
+                                            fontWeight: FontWeight.bold),
+                                  ),
+                                  UiSpacing.verticalSpacingTiny(),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: SizedBox(
+                                      width: 120,
+                                      child: Text(
+                                        'Description',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1
+                                            ?.copyWith(color: grey),
+                                      ),
+                                    ),
+                                  ),
+                                  // UiSpacing.verticalSpacingTiny(),
+                                  //(),
+                                  Text(
+                                    'Duration: 2hr 30mins',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3
+                                        ?.copyWith(color: grey),
+                                  ),
+                                ],
+                              ),
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: primaryColor,
+                                child: IconButton(
+                                  onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          const Course(),
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.video_library,
+                                    color: kWhite,
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

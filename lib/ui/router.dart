@@ -5,6 +5,7 @@ import 'views/login.dart';
 import 'views/navigation.dart';
 import 'views/onboarding.dart';
 import 'views/signup.dart';
+import 'views/profile.dart';
 
 class Routers {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -13,15 +14,15 @@ class Routers {
         return MaterialPageRoute(builder: (_) => const Onboarding());
 
       case '/login':
-        return MaterialPageRoute(builder: (_) => Login());
+        return MaterialPageRoute(builder: (_) => const Login());
       case '/signup':
         return MaterialPageRoute(builder: (_) => SignUp());
       case '/dashboard':
         return MaterialPageRoute(builder: (_) => const Dashboard());
       case '/navigation':
         return MaterialPageRoute(builder: (_) => const Navigation());
-      // case '/pageStructure':
-      //   return MaterialPageRoute(builder: (_) => PageStructure());
+      case '/profile':
+        return MaterialPageRoute(builder: (_) => Profile());
 
       // case '/sessionInfo':
       //   final args = settings.arguments as SessionInfoArguments;
