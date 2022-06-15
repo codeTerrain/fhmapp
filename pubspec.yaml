@@ -40,11 +40,22 @@ dependencies:
   provider: ^6.0.2
   stacked: ^2.3.3
   shared_preferences: ^2.0.13
+  cached_network_image: ^3.2.0
+  fluttertoast: ^8.0.9
+  image_picker: ^0.8.5+3
+  flutter_typeahead: ^4.0.0
+  geolocator: ^8.2.1
+
+  google_maps_flutter: ^2.1.7
+  google_maps_webservice: ^0.0.20-nullsafety.5
+  location: ^4.4.0
+  flutter_polyline_points: ^1.0.0
 
   firebase_auth: ^3.3.15
   cloud_firestore: ^3.1.13
   firebase_messaging: ^11.2.14
   firebase_storage: ^10.2.13
+  intl: ^0.17.0
 
   path_provider: ^2.0.9
   dio: ^4.0.6
@@ -53,6 +64,8 @@ dependencies:
   webview_flutter: ^3.0.2
   html: ^0.15.0
   http: ^0.13.4
+
+  image_cropper: ^2.0.3
 
   flutter:
     sdk: flutter
@@ -83,6 +96,7 @@ flutter:
     - assets/images/login/
     - assets/images/logos/
     - assets/images/general/
+    - assets/images/profile/
 
       #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

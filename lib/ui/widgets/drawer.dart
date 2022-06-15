@@ -1,7 +1,6 @@
 import 'package:fhmapp/ui/shared/static_lists.dart';
 import 'package:flutter/material.dart';
 
-import '../shared/Routes.dart';
 import '../shared/style.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -23,9 +22,10 @@ class CustomDrawer extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           separatorBuilder: (context, index) => const SizedBox(height: 30),
-          itemCount: 5,
+          itemCount: 6,
           itemBuilder: (context, index) => GestureDetector(
-            onTap: () => Navigator.pushNamed(context, Routes.profile),
+            onTap: () => Navigator.pushNamed(
+                context, drawerItems.values.toList()[index]),
             child: Center(
               child: Text(
                 drawerItems.keys.toList()[index],

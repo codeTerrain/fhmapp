@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/user_model.dart';
+
 class SharedPrefs {
   static final SharedPrefs _instance = SharedPrefs.internal();
   factory SharedPrefs() => _instance;
@@ -19,6 +21,11 @@ class SharedPrefs {
     prefs?.setString(key, value);
   }
 
+  Future<void> setListLocalStorage(String key, List<String> value) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs?.setStringList(key, value);
+  }
+
   Future<String> getLocalStorage(String key) async {
     prefs = await SharedPreferences.getInstance();
 
@@ -27,5 +34,33 @@ class SharedPrefs {
     } else {
       return prefs?.get(key) as String;
     }
+  }
+
+  Future removeEntry(String key) async {
+    prefs = await SharedPreferences.getInstance();
+
+    prefs?.remove(key);
+  }
+
+  setLocalUserData(Users user) {
+    setLocalStorage('userId', user.userId);
+    setLocalStorage('firstName', user.firstName);
+    setLocalStorage('lastName', user.lastName);
+    setLocalStorage('community', user.community ?? '');
+    setLocalStorage('email', user.email);
+    setLocalStorage('phone', user.phone);
+    setLocalStorage('cadre', user.cadre);
+    setLocalStorage('region', user.region);
+    setLocalStorage('gender', user.gender);
+    setLocalStorage('district', user.district);
+    setLocalStorage('facility', user.facility);
+    setLocalStorage('subDistrict', user.subDistrict ?? '');
+    setLocalStorage('userType', user.userType);
+    setLocalStorage(
+        'dateJoined', user.dateJoined.millisecondsSinceEpoch.toString());
+    setLocalStorage('dob', user.dob.millisecondsSinceEpoch.toString());
+    setLocalStorage('profilePicture', user.profilePicture ?? '');
+    setListLocalStorage('fhmappAdminFor', user.fhmappAdminFor ?? []);
+    setLocalStorage('login', 'true');
   }
 }

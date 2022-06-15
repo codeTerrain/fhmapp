@@ -3,7 +3,9 @@ import 'package:fhmapp/ui/views/resources_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import '../shared/style.dart';
+import '../widgets/misc.dart';
 import 'chat_category.dart';
+import 'compendium.dart';
 import 'dashboard.dart';
 import 'elearning.dart';
 
@@ -19,12 +21,13 @@ class _NavigationState extends State<Navigation> {
 
   final List<Widget> _pages = <Widget>[
     const ResourcesCategory(),
-    const Center(
-        child: Icon(
-      Icons.location_on_outlined,
-      color: primaryColor,
-      size: 300,
-    )),
+    const Compendium(),
+    // const Center(
+    //     child: Icon(
+    //   Icons.location_on_outlined,
+    //   color: primaryColor,
+    //   size: 300,
+    // )),
     const ELearning(),
     const ChatCategory()
   ];
@@ -77,13 +80,10 @@ class _NavigationState extends State<Navigation> {
                 color: color,
               ),
               const SizedBox(height: 3),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  iconCaption[index],
-                  maxLines: 1,
-                  style: TextStyle(color: color, fontSize: 12),
-                ),
+              Text(
+                iconCaption[index],
+                maxLines: 1,
+                style: TextStyle(color: color, fontSize: 12),
               )
             ],
           );
@@ -92,7 +92,7 @@ class _NavigationState extends State<Navigation> {
         gapLocation: GapLocation.center,
         notchSmoothness: NotchSmoothness.defaultEdge,
         leftCornerRadius: 28,
-        gapWidth: 25,
+        gapWidth: 100,
         rightCornerRadius: 28,
         onTap: (index) => setState(() {
           _bottomNavIndex = index;
@@ -101,7 +101,7 @@ class _NavigationState extends State<Navigation> {
         itemCount: 4,
       ),
       body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: _bottomNavIndex == 1 ? EdgeInsets.zero : mainPadding,
           child: isDashboard ? const Dashboard() : _pages[_bottomNavIndex]),
     );
   }

@@ -13,8 +13,19 @@ class Validator {
 
   static String? isValidPassword(String? password) {
     var pass = password?.trim();
-    if (pass!.isEmpty) {
-      return 'Please provide your password';
+    if (pass!.isEmpty || pass.length < 8) {
+      return 'Please provide a password with at least 8 characters';
+    } else {
+      return null;
+    }
+  }
+
+  static String? validField(String? field, String fieldName) {
+    var x = field?.trim();
+    if (x!.isEmpty) {
+      return 'Please enter your $fieldName';
+    } else {
+      return null;
     }
   }
 }

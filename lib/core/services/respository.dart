@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fhmapp/core/model/facility_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
+import '../model/chat_item_model.dart';
 import '../model/user_model.dart';
 
 class Respository {
@@ -29,19 +31,42 @@ class Respository {
     return Users.fromJson(userDocMap, userDoc.id);
   }
 
-  updateToken(
-      {required String email,
-      required Set<String> updatedLoggedInDevices}) async {
+  updateToken({
+    String? token,
+    required String email,
+    required Set<String> updatedLoggedInDevices,
+  }) async {
     var userDoc = await getUser(email);
     DocumentReference userDocRef = userDoc.reference;
+    List<String>? distinctDevices;
 
-    userDocRef.update({'loggedInDevices': updatedLoggedInDevices.toList()});
+    if (updatedLoggedInDevices.isEmpty) {
+      List<String> getAllLoggedInDevices =
+          List<String>.from(userDoc['loggedInDevices']);
+      getAllLoggedInDevices.remove(token);
+
+      distinctDevices = getAllLoggedInDevices.toSet().toList();
+    } else {
+      distinctDevices = updatedLoggedInDevices.toList();
+    }
+    userDocRef.update({'loggedInDevices': distinctDevices});
   }
 
   userOnlineState({required String email, required bool online}) async {
     var userDoc = await getUser(email);
     DocumentReference userDocRef = userDoc.reference;
     userDocRef.update({'onlineStatus': online});
+  }
+
+  updateInfo(String email, Map<String, dynamic> data) async {
+    try {
+      var userDoc = await getUser(email);
+      DocumentReference userDocRef = userDoc.reference;
+      userDocRef.update(data).timeout(const Duration(minutes: 3));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<ListResult> getResource(String category) {
@@ -75,5 +100,122 @@ class Respository {
 
       return e.toString();
     }
+  }
+
+  Future addMessage(String chatRoomId, Map<String, dynamic> messageItem) async {
+    var addCompleteChat =
+        _db.collection('FHMAppChat').doc(chatRoomId).collection('chats').doc();
+    var addLastMessage = _db.collection('FHMAppChat').doc(chatRoomId);
+    DocumentSnapshot<Map<String, dynamic>> getLastMessage =
+        await addLastMessage.get();
+    if (!getLastMessage.exists) {
+      return _db.runTransaction((transaction) async {
+        transaction
+            .set(
+              addCompleteChat,
+              messageItem,
+            )
+            .set(addLastMessage, messageItem);
+      });
+    } else {
+      return _db.runTransaction((transaction) async {
+        transaction
+            .set(
+              addCompleteChat,
+              messageItem,
+            )
+            .update(addLastMessage, messageItem);
+      });
+    }
+  }
+
+  Future addPost(Map<String, dynamic> postItem) async {
+    var addPost = _db.collection('posts').doc();
+
+    return _db.runTransaction((transaction) async {
+      transaction.set(
+        addPost,
+        postItem,
+      );
+    });
+  }
+
+  Stream<QuerySnapshot> getMessages(String chatRoomId) {
+    Stream<QuerySnapshot> query = _db
+        .collection('FHMAppChat')
+        .doc(chatRoomId)
+        .collection('chats')
+        .orderBy('createdAt')
+        .snapshots();
+
+    return query;
+  }
+
+  Stream<List<ChatItemModel>> getLastChats(String category) {
+    Stream<List<ChatItemModel>> query = _db
+        .collection('FHMAppChat')
+        .orderBy('createdAt')
+        .where('id', isEqualTo: category)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((document) => ChatItemModel.fromFirestore(document))
+            .toList());
+
+    return query;
+  }
+
+  Stream<List<ChatItemModel>> getUnreadChats(
+      String category, String chatUserId, String userType) {
+    CollectionReference<Map<dynamic, dynamic>> collectionRef = _db
+        .collection('FHMAppChat')
+        .doc(category + '_' + chatUserId)
+        .collection('chats');
+    if (userType == 'nationalRep') {
+      Stream<List<ChatItemModel>> query = collectionRef
+          .where('isRead', isEqualTo: false)
+          .where('user.uid', isEqualTo: chatUserId)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((document) => ChatItemModel.fromFirestore(document))
+              .toList());
+
+      return query;
+    } else {
+      Stream<List<ChatItemModel>> query = collectionRef
+          .where('readByUser', isEqualTo: false)
+          .where('user.uid', isNotEqualTo: chatUserId)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((document) => ChatItemModel.fromFirestore(document))
+              .toList());
+
+      return query;
+    }
+  }
+
+  Future<Users> setUserDetails(Map<String, dynamic> data) async {
+    final DocumentReference user = _db.collection('users').doc();
+
+    await user.set(data);
+    return Users.fromSignUp(data, user.id);
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> userSnapshots(
+      String userDocId) {
+//String userDocId =   _respository.getLocalStorage('userDocId');
+    return _db.collection('users').doc(userDocId).snapshots();
+  }
+
+  Stream<List<Facility>> getFacilities() {
+    Stream<List<Facility>> facilities = _db
+        .collection('facilities')
+        .orderBy('name')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((document) {
+              // print(snapshot);
+              return Facility.fromFirestore(document);
+            }).toList());
+
+    return facilities;
   }
 }

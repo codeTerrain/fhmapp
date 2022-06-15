@@ -35,7 +35,7 @@ class LoginViewModel extends MultipleFutureViewModel {
         if (result) {
           Users user = await _respository.getUserDetail(email);
           addLoggedinDevice(user);
-          setLocalUserData(user);
+          _sharedPrefs.setLocalUserData(user);
           _respository.userOnlineState(email: email, online: true);
           _navigationService.navigateTo(Routes.navigation);
         }
@@ -60,28 +60,6 @@ class LoginViewModel extends MultipleFutureViewModel {
       _respository.updateToken(
           email: user.email, updatedLoggedInDevices: loggedInDevices);
     });
-  }
-
-  setLocalUserData(Users user) {
-    _sharedPrefs.setLocalStorage('userId', user.userId);
-    _sharedPrefs.setLocalStorage('firstName', user.firstName);
-    _sharedPrefs.setLocalStorage('lastName', user.lastName);
-    _sharedPrefs.setLocalStorage('community', user.community ?? '');
-    _sharedPrefs.setLocalStorage('email', user.email);
-    _sharedPrefs.setLocalStorage('phone', user.phone);
-    _sharedPrefs.setLocalStorage('cadre', user.cadre);
-    _sharedPrefs.setLocalStorage('region', user.region);
-    _sharedPrefs.setLocalStorage('gender', user.gender);
-    _sharedPrefs.setLocalStorage('district', user.district);
-    _sharedPrefs.setLocalStorage('facility', user.facility);
-    _sharedPrefs.setLocalStorage('subDistrict', user.subDistrict ?? '');
-    _sharedPrefs.setLocalStorage('userType', user.userType);
-    _sharedPrefs.setLocalStorage(
-        'dateJoined', user.dateJoined.millisecondsSinceEpoch.toString());
-    _sharedPrefs.setLocalStorage(
-        'dob', user.dob.millisecondsSinceEpoch.toString());
-    _sharedPrefs.setLocalStorage('profilePicture', user.profilePicture ?? '');
-    _sharedPrefs.setLocalStorage('login', 'true');
   }
 
   @override

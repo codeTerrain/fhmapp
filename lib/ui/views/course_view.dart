@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import '../viewmodels/profile_model.dart';
+import '../viewmodels/elearning_view_model.dart';
 
-class Course extends StatefulWidget {
-  const Course({Key? key}) : super(key: key);
+class CourseView extends StatefulWidget {
+  final String url;
+  const CourseView({required this.url, Key? key}) : super(key: key);
 
   @override
-  State<Course> createState() => _CourseState();
+  State<CourseView> createState() => _CourseViewState();
 }
 
-class _CourseState extends State<Course> {
+class _CourseViewState extends State<CourseView> {
   late WebViewController controller;
 
   @override
@@ -22,8 +23,8 @@ class _CourseState extends State<Course> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ViewModelBuilder<ProfileViewModel>.reactive(
-          viewModelBuilder: () => ProfileViewModel(),
+        child: ViewModelBuilder<ElearningViewModel>.reactive(
+          viewModelBuilder: () => ElearningViewModel(),
           onModelReady: (model) => model.getElearnCredential(),
           builder: (context, model, child) => WebView(
             onWebViewCreated: ((controller) {
@@ -40,8 +41,7 @@ class _CourseState extends State<Course> {
                 await controller.runJavascript("document.forms[1].submit()");
               }
             },
-            initialUrl:
-                'http://46.101.235.240/ghslearning/course/view.php?id=7',
+            initialUrl: widget.url,
             javascriptMode: JavascriptMode.unrestricted,
           ),
         ),

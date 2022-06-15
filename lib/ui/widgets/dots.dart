@@ -131,8 +131,12 @@ class DotsIndicator extends StatelessWidget {
 class Dots extends StatelessWidget {
   final double currentPage;
   final PageController pageController;
+  final GlobalKey<FormState> formKey;
   const Dots(
-      {Key? key, required this.pageController, required this.currentPage})
+      {Key? key,
+      required this.pageController,
+      required this.formKey,
+      required this.currentPage})
       : super(key: key);
 
   Future<void> animateScroll(int page) async {
@@ -152,7 +156,12 @@ class Dots extends StatelessWidget {
         // reversed: widget.rtl,
         dotsCount: 4,
         position: currentPage,
-        onTap: (pos) => animateScroll(pos.toInt()),
+        onTap: (pos) {
+          if (formKey.currentState!.validate()) {
+            formKey.currentState?.save();
+            animateScroll(pos.toInt());
+          }
+        },
         decorator: const DotsDecorator(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(25.0))),

@@ -66,14 +66,14 @@ class _OnboardingState extends State<Onboarding> {
           PageViewModel(
             title: "Your baby's health, our concern",
             body: " ",
-            image: _buildImage('maternal.png'),
+            image: _buildImage('workers.png'),
             decoration: pageDecoration,
           ),
           PageViewModel(
             title: "Good Food, Good Health",
             body: "Your Health, Our concern",
             decoration: pageDecoration,
-            image: _buildImage('nutrition.png'),
+            image: _buildImage('midwives.png'),
           ),
         ],
         onDone: () => _onIntroEnd(context),

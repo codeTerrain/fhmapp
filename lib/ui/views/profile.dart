@@ -1,88 +1,90 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fhmapp/ui/shared/spacing.dart';
+import 'package:fhmapp/ui/widgets/appbars.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
-
-import '../shared/spacing.dart';
 import '../shared/style.dart';
-import '../shared/validator.dart';
-import '../viewmodels/profile_model.dart';
-import '../widgets/buttons.dart';
-import '../widgets/custom_textfield.dart';
+import '../viewmodels/profile_view_model.dart';
+import '../widgets/misc.dart';
+import '../widgets/tiles.dart';
 
 class Profile extends StatelessWidget {
-  Profile({Key? key}) : super(key: key);
-
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController oldPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  const Profile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Form(
-          key: _formKey,
+      appBar: InfoAppBar(
+        title: Text(
+          'Profile',
+          style: Theme.of(context).textTheme.headline5,
+        ),
+        trailing: drawerCaller(context),
+      ),
+      body: SingleChildScrollView(
+        physics: scrollPhysics,
+        child: Padding(
+          padding: mainPadding,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CustomTextField(
-                width: UiSpacing.screenSize(context).width,
-                controller: oldPasswordController,
-                keyboardType: TextInputType.emailAddress,
-                hintText: 'Old Password',
-                prefixIcon: Image.asset('assets/images/login/user.png'),
-              ),
-              UiSpacing.verticalSpacingSmall(),
-              CustomTextField(
-                width: UiSpacing.screenSize(context).width,
-                controller: usernameController,
-                keyboardType: TextInputType.emailAddress,
-                hintText: 'Username',
-                prefixIcon: Image.asset('assets/images/login/user.png'),
-              ),
-              UiSpacing.verticalSpacingSmall(),
-              CustomTextField(
-                width: UiSpacing.screenSize(context).width,
-                controller: newPasswordController,
-                hintText: 'Password',
-                obscureText: true,
-                prefixIcon: Image.asset('assets/images/login/password.png'),
-                validator: (input) => Validator.isValidPassword(input),
-              ),
-              UiSpacing.verticalSpacingSmall(),
-              CustomTextField(
-                width: UiSpacing.screenSize(context).width,
-                controller: confirmPasswordController,
-                hintText: 'Confirm password',
-                obscureText: true,
-                prefixIcon: Image.asset('assets/images/login/password.png'),
-                validator: (input) => Validator.isValidPassword(input),
-              ),
-              UiSpacing.verticalSpacingSmall(),
-              Center(
-                child: ViewModelBuilder<ProfileViewModel>.reactive(
+              ViewModelBuilder<ProfileViewModel>.reactive(
                   viewModelBuilder: () => ProfileViewModel(),
-                  builder: (context, model, child) => RoundedButtonTheme(
-                    width: model.isBusy ? 130 : 100,
-                    text: model.isBusy ? 'Please wait' : 'Save',
-                    buttonColor: kBlack,
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState?.save();
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        model.elearnLogin(
-                            context: context,
-                            username: usernameController.text,
-                            newPassword: newPasswordController.text,
-                            oldPassword: oldPasswordController.text);
-                      }
-                    },
-                  ),
-                ),
-              ),
+                  onModelReady: (model) => model.getUserInfo(),
+                  builder: (context, model, child) {
+                    if (model.isBusy) {
+                      return const CircularProgressIndicator();
+                    } else {
+                      return Column(
+                        children: [
+                          ClipOval(
+                              child: model.user.profilePicture != ''
+                                  ? CachedNetworkImage(
+                                      imageUrl: (model.imageUrl == null ||
+                                              model.imageUrl == '')
+                                          ? model.user.profilePicture!
+                                          : model.imageUrl!,
+                                      errorWidget: (context, url, error) {
+                                        return noProfile;
+                                      },
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      placeholderFadeInDuration:
+                                          const Duration(milliseconds: 200),
+                                      width: 90,
+                                      height: 90,
+                                      fit: BoxFit.cover,
+                                      useOldImageOnUrlChange: true,
+                                    )
+                                  : noProfile),
+                          UiSpacing.verticalSpacingTiny(),
+                          Text("${model.user.firstName} ${model.user.lastName}",
+                              style: Theme.of(context).textTheme.headline3),
+                          Text(
+                            model.user.email,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline3
+                                ?.copyWith(color: grey),
+                          )
+                        ],
+                      );
+                    }
+                  }),
+              UiSpacing.verticalSpacingMedium(),
+              ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ProfileTile(
+                          index,
+                        ));
+                  },
+                  itemCount: 4),
+              const SizedBox(
+                height: 500,
+              )
             ],
           ),
         ),

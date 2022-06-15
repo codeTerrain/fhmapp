@@ -5,7 +5,7 @@ import 'package:stacked/stacked.dart';
 import '../../core/services/utilities.dart';
 import '../../locator.dart';
 
-class ProfileViewModel extends MultipleFutureViewModel {
+class ElearningViewModel extends MultipleFutureViewModel {
   final SharedPrefs _sharedPrefs = locator<SharedPrefs>();
 
   String? _elearnUsername;
@@ -38,6 +38,7 @@ class ProfileViewModel extends MultipleFutureViewModel {
       String oldPassword, String username, String newPassword) async {
     try {
       await _sharedPrefs.getLocalStorage('elearnUsername');
+
       var _elearnPassword =
           await _sharedPrefs.getLocalStorage('elearnPassword');
 
@@ -59,8 +60,6 @@ class ProfileViewModel extends MultipleFutureViewModel {
       _elearnUsername = await _sharedPrefs.getLocalStorage('elearnUsername');
       _elearnPassword = await _sharedPrefs.getLocalStorage('elearnPassword');
       setBusy(false);
-
-      //  return [elearnUsername, _elearnPassword];
     } catch (e) {
       return e;
     }

@@ -26,7 +26,7 @@ class Resources extends StatelessWidget {
       body: CustomScrollView(
         physics: scrollPhysics,
         slivers: [
-          InfoAppBar(
+          SliverInfoAppBar(
             title: Text(
               'Resources',
               style: Theme.of(context).textTheme.headline5,
@@ -43,9 +43,9 @@ class Resources extends StatelessWidget {
               viewModelBuilder: () => ResourceService(),
               onModelReady: (model) => model.getAllResources(categoryKey),
               builder: (context, model, child) {
-                List<ResourceModel> allResources = model.resources;
+                List<Resource> allResources = model.resources;
                 return SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    padding: mainPadding,
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         return ResourceTile(resource: allResources[index]);
@@ -59,7 +59,7 @@ class Resources extends StatelessWidget {
 }
 
 class ResourceTile extends StatelessWidget {
-  final ResourceModel resource;
+  final Resource resource;
   const ResourceTile({
     required this.resource,
     Key? key,
@@ -94,7 +94,7 @@ class Downloader extends StatefulWidget {
     required this.resource,
   }) : super(key: key);
 
-  final ResourceModel resource;
+  final Resource resource;
 
   @override
   State<Downloader> createState() => _DownloaderState();
@@ -103,7 +103,7 @@ class Downloader extends StatefulWidget {
 class _DownloaderState extends State<Downloader> {
   late String _downloadProgress;
 
-  downloadResource(BuildContext context, ResourceModel resource) async {
+  downloadResource(BuildContext context, Resource resource) async {
     var dio = Dio();
     String resourceName = resource.name;
 

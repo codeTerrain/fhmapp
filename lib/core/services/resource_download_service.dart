@@ -13,8 +13,8 @@ import '../../locator.dart';
 class ResourceService extends BaseViewModel {
   final Respository _respository = locator<Respository>();
 
-  final List<ResourceModel> _resources = [];
-  List<ResourceModel> get resources => _resources;
+  final List<Resource> _resources = [];
+  List<Resource> get resources => _resources;
 
   static String getFileName(Reference file) {
     String fileName = file.name.splitMapJoin(
@@ -58,7 +58,7 @@ class ResourceService extends BaseViewModel {
     String fullPath = '$path/$category';
     var pathOfDirectory = await Directory(fullPath).create();
     List<FileSystemEntity> fileList = await pathOfDirectory.list().toList();
-    List<ResourceModel> offlineList = [];
+    List<Resource> offlineList = [];
     for (var doc in fileList) {
       // doc.deleteSync(recursive: true);
       Map<String, Object> data = {
@@ -68,7 +68,7 @@ class ResourceService extends BaseViewModel {
         'extension': getFileExtension(doc.path.split('/').last),
         'isRemote': false
       };
-      offlineList.add(ResourceModel.fromAPI(data));
+      offlineList.add(Resource.fromAPI(data));
     }
     _resources.insertAll(_resources.length, offlineList);
     notifyListeners();
@@ -77,7 +77,7 @@ class ResourceService extends BaseViewModel {
     var onlineResources = await _respository.getResources(category);
     if (onlineResources is QuerySnapshot) {
       List<DocumentSnapshot> docs = onlineResources.docs;
-      List<ResourceModel> onlineList = [];
+      List<Resource> onlineList = [];
 
       for (var doc in docs) {
         Map<String, Object> data = {
@@ -87,14 +87,14 @@ class ResourceService extends BaseViewModel {
           'extension': doc['extension'],
           'isRemote': true
         };
-        onlineList.add(ResourceModel.fromAPI(data));
+        onlineList.add(Resource.fromAPI(data));
 
 //check (by name) if online document has already been downloaded
         var downloadedResource =
             _resources.where((resource) => resource.name == doc['name']);
 
         if (downloadedResource.isEmpty) {
-          _resources.add(ResourceModel.fromAPI(data));
+          _resources.add(Resource.fromAPI(data));
         }
       }
 

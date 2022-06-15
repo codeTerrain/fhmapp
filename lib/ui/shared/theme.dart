@@ -27,15 +27,20 @@ ThemeData themeData = ThemeData(
           fontWeight: FontWeight.bold,
           fontFamily: 'Avenir'),
       headline3: const TextStyle(
-          color: kWhite,
-          fontSize: 11,
-          fontWeight: FontWeight.w400,
+          color: primaryColor,
+          fontWeight: FontWeight.w900,
+          fontSize: 15,
           fontFamily: 'Avenir'),
       button: const TextStyle(color: kWhite),
       headline6: const TextStyle(
           color: kWhite,
           fontWeight: FontWeight.w600,
           fontSize: 40,
+          fontFamily: 'Avenir'),
+      headline4: const TextStyle(
+          color: kWhite,
+          fontWeight: FontWeight.normal,
+          fontSize: 13,
           fontFamily: 'Avenir'),
       subtitle2: const TextStyle(
           color: primaryColor, fontSize: 25, fontFamily: 'Avenir'),

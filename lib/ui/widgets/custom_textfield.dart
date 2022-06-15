@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   final double height;
   final double width;
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   const CustomTextField(
       {this.hintText = '',
       Key? key,
@@ -29,6 +30,7 @@ class CustomTextField extends StatefulWidget {
       this.width = 300,
       this.maxLines,
       this.prefixIcon,
+      this.suffixIcon,
       this.validator})
       : super(key: key);
 
@@ -66,10 +68,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
             enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: primaryColor, width: 2.0),
             ),
+            disabledBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: primaryColor, width: 2.0),
+            ),
             focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: secondary1, width: 2.0),
             ),
             prefixIcon: widget.prefixIcon,
+            suffixIconColor: grey,
+            suffixIconConstraints: const BoxConstraints(minWidth: 30),
             suffixIcon: widget.obscureText
                 ? IconButton(
                     onPressed: () {
@@ -81,7 +88,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             : Icons.visibility,
                         color: _obscureText == true ? primaryColor : grey),
                   )
-                : null),
+                : widget.suffixIcon),
       ),
     );
   }

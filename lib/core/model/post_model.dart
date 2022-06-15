@@ -5,8 +5,8 @@ class Post {
   final String category;
   final String? content;
   final DateTime date;
-  final List<Widget>? images;
-  final bool isLiked;
+  final List<String>? images;
+  final List<String> likes;
 
   Post(
       {required this.postId,
@@ -14,7 +14,7 @@ class Post {
       this.content,
       required this.date,
       this.images,
-      required this.isLiked});
+      required this.likes});
 }
 
 List<Post> dummyPosts = [
@@ -24,38 +24,29 @@ List<Post> dummyPosts = [
       content: 'Every day is a good day to be healthy',
       date: DateTime(2022, 3, 15),
       images: [
-        Image.asset(
-          'assets/images/dashboard/dummyFamily.png',
-          //scale: 3,
-          fit: BoxFit.fitWidth,
-        ),
-        Image.asset(
-          'assets/images/dashboard/dummyFamily.png',
-          fit: BoxFit.fitWidth,
-          scale: 3,
-        ),
-        Image.asset(
-          'assets/images/dashboard/dummyFamily.png',
-          fit: BoxFit.fitWidth,
-        )
+        'assets/images/dashboard/dummyFamily.png',
+
+        'assets/images/dashboard/dummyFamily.png',
+
+        'assets/images/dashboard/dummyFamily.png',
+        // fit: BoxFit.fitWidth,
       ],
-      isLiked: true),
+      likes: [
+        'PedHu77dM0fVk1sGzniCZifIEHf1'
+      ]),
   Post(
       postId: '2',
       category: 'Family Planning',
       content: 'Contraceptives are vital in the prevention of pregnancy',
       date: DateTime(2020, 4, 5),
-      isLiked: true),
+      likes: []),
   Post(
       postId: '3',
       category: 'Nutrition',
       content: 'Eat right, stay healthy. Nothing beats that',
       images: [
-        Image.asset(
-          'assets/images/dashboard/dummyFamily.png',
-          fit: BoxFit.fitWidth,
-        )
+        'assets/images/dashboard/dummyFamily.png',
       ],
       date: DateTime(2021, 3, 15),
-      isLiked: true)
+      likes: [])
 ];

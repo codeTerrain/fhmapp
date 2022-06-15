@@ -19,8 +19,8 @@ class Course {
     required this.userTaps,
   });
 
-  factory Course.fromJson(Map<dynamic, dynamic> data, String docId) => Course(
-        courseDocId: docId,
+  factory Course.fromAPI(Map data) => Course(
+        courseDocId: data['courseDocId'],
         id: data['id'],
         name: data['name'],
         description: data['description'],
