@@ -3,8 +3,10 @@ import 'package:fhmapp/ui/shared/spacing.dart';
 import 'package:fhmapp/ui/shared/style.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import '../../core/services/respository.dart';
+import '../../locator.dart';
 import '../shared/static_lists.dart';
-import '../viewmodels/search_view.dart';
+import '../viewmodels/profile_view_model.dart';
 import '../widgets/appbars.dart';
 import '../widgets/misc.dart';
 import '../widgets/poster.dart';
@@ -22,6 +24,7 @@ class _DashboardState extends State<Dashboard> {
   bool foc = false;
   final TextEditingController _searchController = TextEditingController();
   late List<String> _topicFilters;
+  final Respository _respository = locator<Respository>();
 
   @override
   void initState() {
@@ -50,61 +53,50 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<SearchViewModel>.reactive(
-      viewModelBuilder: () => SearchViewModel(),
-      builder: (context, model, child) {
-        return FocusScope(
-          child: Focus(
-            focusNode: _focus,
-            onFocusChange: onFocusChange,
-            child: Listener(
-              onPointerMove: (moveEvent) {
-                if (foc) {
-                  foc = false;
-                  _focus.unfocus();
-                }
-              },
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  CustomScrollView(physics: scrollPhysics, slivers: [
-                    SearchAppBar(
-                      searchController: _searchController,
-                      filter: _filter,
-                      trailing: newPostCaller(context),
-                    ),
-
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          if ((_topicFilters
-                                      .contains(dummyPosts[index].category) ||
-                                  _topicFilters.isEmpty) &&
-                              (_filter == null ||
-                                  dummyPosts[index]
-                                      .content!
-                                      .toLowerCase()
-                                      .contains(_filter!.toLowerCase()) ||
-                                  dummyPosts[index]
-                                      .category
-                                      .toLowerCase()
-                                      .contains(_filter!.toLowerCase()))) {
-                            return Poster(post: dummyPosts[index]);
-                          }
+    return FocusScope(
+      child: Focus(
+        focusNode: _focus,
+        onFocusChange: onFocusChange,
+        child: Listener(
+          onPointerMove: (moveEvent) {
+            if (foc) {
+              foc = false;
+              _focus.unfocus();
+            }
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CustomScrollView(physics: scrollPhysics, slivers: [
+                SearchAppBar(
+                  searchController: _searchController,
+                  filter: _filter,
+                  trailing: ViewModelBuilder<ProfileViewModel>.reactive(
+                      viewModelBuilder: () => ProfileViewModel(),
+                      onModelReady: (model) => model.getUserInfo(),
+                      builder: (context, model, child) {
+                        if (model.isBusy) {
                           return const SizedBox();
-                        },
-                        childCount: 3,
-                      ),
-                    ),
-                    //),
-                  ]),
-                  _focus.hasFocus ? tagFilter(context) : const SizedBox(),
-                ],
-              ),
-            ),
+                        }
+                        return (model.user.fhmappAdminFor != null &&
+                                model.user.fhmappAdminFor!.isNotEmpty)
+                            ? newPostCaller(context, model.user.fhmappAdminFor)
+                            : const SizedBox();
+                      }),
+                ),
+                AllPosts(
+                    respository: _respository,
+                    topicFilters: _topicFilters,
+                    filter: _filter)
+                //   },
+                // )
+                //),
+              ]),
+              _focus.hasFocus ? tagFilter(context) : const SizedBox(),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -173,5 +165,59 @@ class _DashboardState extends State<Dashboard> {
       chips.add(item);
     }
     return chips;
+  }
+}
+
+class AllPosts extends StatelessWidget {
+  const AllPosts({
+    Key? key,
+    required Respository respository,
+    required List<String> topicFilters,
+    required String? filter,
+  })  : _respository = respository,
+        _topicFilters = topicFilters,
+        _filter = filter,
+        super(key: key);
+
+  final Respository _respository;
+  final List<String> _topicFilters;
+  final String? _filter;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Post>>(
+        stream: _respository.getPosts(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return SliverToBoxAdapter(
+                child: Center(child: Text('Error: ${snapshot.error}')));
+          }
+          if (!snapshot.hasData) {
+            return const SliverToBoxAdapter(
+                child: Center(child: Text('Loading...')));
+          }
+          List<Post> posts = snapshot.data!;
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                if ((_topicFilters.contains(posts[index].category) ||
+                        _topicFilters.isEmpty) &&
+                    (_filter == null ||
+                        posts[index]
+                            .content!
+                            .toLowerCase()
+                            .contains(_filter!.toLowerCase()) ||
+                        posts[index]
+                            .category
+                            .toLowerCase()
+                            .contains(_filter!.toLowerCase()))) {
+                  return Poster(post: posts[index]);
+                }
+                return const SizedBox();
+              },
+              childCount: posts.length,
+            ),
+          );
+        });
   }
 }

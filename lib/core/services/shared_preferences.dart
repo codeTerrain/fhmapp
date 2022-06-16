@@ -36,6 +36,16 @@ class SharedPrefs {
     }
   }
 
+  Future<List<String>?> getListLocalStorage(String key) async {
+    prefs = await SharedPreferences.getInstance();
+
+    if (prefs?.get(key) == null) {
+      return [];
+    } else {
+      return prefs?.getStringList(key);
+    }
+  }
+
   Future removeEntry(String key) async {
     prefs = await SharedPreferences.getInstance();
 

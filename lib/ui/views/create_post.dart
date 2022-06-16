@@ -10,12 +10,15 @@ import 'package:stacked/stacked.dart';
 import '../viewmodels/post_view_model.dart';
 import '../widgets/appbars.dart';
 import '../widgets/change_info.dart';
+import '../widgets/drop_down.dart';
 import '../widgets/misc.dart';
+import '../widgets/neumorph_drop_down.dart';
 import '../widgets/neumorph_textfield.dart';
 import '../widgets/selected_images_view.dart';
 
 class CreatePost extends StatefulWidget {
-  const CreatePost({Key? key}) : super(key: key);
+  final List<String>? fhmappAdminFor;
+  const CreatePost({Key? key, this.fhmappAdminFor}) : super(key: key);
 
   @override
   State<CreatePost> createState() => _CreatePostState();
@@ -25,6 +28,13 @@ class _CreatePostState extends State<CreatePost> {
   List<File> imageFiles = [];
 
   final TextEditingController _contentController = TextEditingController();
+  late String fhmappAdminFor;
+
+  @override
+  void initState() {
+    fhmappAdminFor = widget.fhmappAdminFor![0];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +44,8 @@ class _CreatePostState extends State<CreatePost> {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Text(widget.fhmappAdminFor![0]),
+
           imageFiles.isEmpty
               ? const SizedBox()
               : SingleChildScrollView(
@@ -43,26 +55,31 @@ class _CreatePostState extends State<CreatePost> {
                       height: 100,
                       child: SelectedImages(imageFiles: imageFiles))),
           UiSpacing.verticalSpacingTiny(),
-          Container(
-            height: 45,
-            width: UiSpacing.screenSize(context).width,
-            padding: containerPadding,
-            decoration: const BoxDecoration(
-                color: kWhite,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(23))),
-            child: Row(
-              textBaseline: TextBaseline.alphabetic,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                galleryActions(
-                    icon: Icons.camera_alt_outlined,
-                    onPressed: () => buttonClicked(false)),
-                UiSpacing.horizontalSpacingTiny(),
-                galleryActions(
-                    icon: Icons.photo_library,
-                    onPressed: () => buttonClicked(true)),
-              ],
-            ),
+          Stack(
+            children: [
+              Container(
+                height: 45,
+                width: UiSpacing.screenSize(context).width,
+                padding: containerPadding,
+                decoration: const BoxDecoration(
+                    color: kWhite,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(23))),
+                child: Row(
+                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    galleryActions(
+                        icon: Icons.camera_alt_outlined,
+                        onPressed: () => buttonClicked(false)),
+                    UiSpacing.horizontalSpacingTiny(),
+                    galleryActions(
+                        icon: Icons.photo_library,
+                        onPressed: () => buttonClicked(true)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -86,7 +103,7 @@ class _CreatePostState extends State<CreatePost> {
                             postId: DateTime.now()
                                 .millisecondsSinceEpoch
                                 .toString(),
-                            category: 'Adolescent Health',
+                            category: fhmappAdminFor,
                             content: _contentController.text,
                             images: imageFiles)
                         .then((value) {
@@ -103,21 +120,40 @@ class _CreatePostState extends State<CreatePost> {
           SliverPadding(
             padding: mainPadding,
             sliver: SliverToBoxAdapter(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 19, vertical: 41),
-                decoration: BoxDecoration(
-                    color: kWhite, borderRadius: generalBorderRadius),
-                height: UiSpacing.screenSize(context).height - 120,
-                width: UiSpacing.screenSize(context).width,
-                child: NeumorphTextField(
-                  maxLength: 300,
-                  isNeumorphic: false,
-                  controller: _contentController,
-                  maxLines: 6,
-                  keyboardType: TextInputType.multiline,
-                  minLines: 4,
-                ),
+              child: Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 19, vertical: 41),
+                    decoration: BoxDecoration(
+                        color: kWhite, borderRadius: generalBorderRadius),
+                    height: UiSpacing.screenSize(context).height - 120,
+                    width: UiSpacing.screenSize(context).width,
+                    child: NeumorphTextField(
+                      maxLength: 300,
+                      isNeumorphic: false,
+                      controller: _contentController,
+                      maxLines: 6,
+                      keyboardType: TextInputType.multiline,
+                      minLines: 4,
+                    ),
+                  ),
+                  Center(
+                    child: NeumorphDropDown(
+                      context,
+                      width: 200,
+                      dropItems: widget.fhmappAdminFor!,
+                      hintText: 'Post For ',
+                      prefixIcon: Image.asset('assets/images/login/user.png'),
+                      value: fhmappAdminFor,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          fhmappAdminFor = newValue!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           )

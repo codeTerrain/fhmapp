@@ -1,3 +1,4 @@
+import 'package:fhmapp/ui/views/create_post.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -55,13 +56,19 @@ Container drawerCaller(BuildContext context) {
   );
 }
 
-Container newPostCaller(BuildContext context) {
+Container newPostCaller(BuildContext context, List<String>? fhmappAdminFor) {
   return Container(
     margin: const EdgeInsets.only(left: 10),
     width: 50,
     height: 50,
     child: IconButton(
-      onPressed: () => Navigator.pushNamed(context, Routes.createPost),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) =>
+              CreatePost(fhmappAdminFor: fhmappAdminFor),
+        ),
+      ),
       icon: Image.asset('assets/images/dashboard/newPost.png'),
       color: primaryColor,
     ),

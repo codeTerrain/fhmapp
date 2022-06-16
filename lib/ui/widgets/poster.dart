@@ -1,13 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fhmapp/core/services/utilities.dart';
+import 'package:fhmapp/ui/viewmodels/post_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../core/model/post_model.dart';
 import '../shared/spacing.dart';
 import '../shared/style.dart';
-import '../viewmodels/login_view_model.dart';
 import '../viewmodels/profile_view_model.dart';
 import 'misc.dart';
 
@@ -25,63 +26,83 @@ class Poster extends StatelessWidget {
     var boxDecoration =
         BoxDecoration(color: kWhite, borderRadius: generalBorderRadius);
 
+    const verticalEdgeInsets = EdgeInsets.symmetric(vertical: 12);
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
+      margin: verticalEdgeInsets,
       decoration: boxDecoration,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: verticalEdgeInsets,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(
-          children: [
-            programmeTag(context,
-                text: post.category,
-                style: Theme.of(context).textTheme.headline4),
-            //   UiSpacing.horizontalSpacingTiny(),
-            Text(
-              formatTime(post.date),
-              style: Theme.of(context).textTheme.headline4?.copyWith(
-                    color: transGrey,
-                  ),
-            ),
-          ],
-        ),
+        Row(children: [
+          programmeTag(context,
+              text: post.category,
+              style: Theme.of(context).textTheme.headline4),
+          Text(
+            formatTime(post.date),
+            style: Theme.of(context)
+                .textTheme
+                .headline4
+                ?.copyWith(color: transGrey),
+          )
+        ]),
         UiSpacing.verticalSpacingSmall(),
-        post.images != null
+        (post.images != null && post.images!.isNotEmpty)
             ? Stack(
                 alignment: Alignment.center,
                 children: [
-                  CarouselSlider(
-                    items: post.images?.map((image) {
-                      return Image.asset(image, fit: BoxFit.fitWidth);
-                    }).toList(),
-                    carouselController: _carouselController,
-                    options: CarouselOptions(
-                      viewportFraction: 1,
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    child: CarouselSlider(
+                      items: post.images?.map((image) {
+                        return ClipRRect(
+                          borderRadius: generalBorderRadius,
+                          child: CachedNetworkImage(
+                            imageUrl: image,
+                            fit: BoxFit.fitWidth,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                    LinearProgressIndicator(
+                              value: downloadProgress.progress,
+                              color: secondary1,
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
+                        );
+                      }).toList(),
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                          viewportFraction: 2,
+                          aspectRatio: 4 / 5,
+                          enableInfiniteScroll: false),
                     ),
                   ),
-                  Padding(
-                    padding: containerPadding,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            onPressed: () => _carouselController.previousPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.linear),
-                            icon: const Icon(
-                              Icons.arrow_back_ios,
-                              size: 20,
-                              color: primaryColor,
-                            )),
-                        IconButton(
-                            onPressed: () => _carouselController.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.linear),
-                            icon: const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 20,
-                              color: primaryColor,
-                            )),
-                      ],
+                  Visibility(
+                    visible: post.images!.length < 2 ? false : true,
+                    child: Padding(
+                      padding: containerPadding,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                              onPressed: () => _carouselController.previousPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.linear),
+                              icon: const Icon(
+                                Icons.arrow_back_ios,
+                                size: 20,
+                                color: primaryColor,
+                              )),
+                          IconButton(
+                              onPressed: () => _carouselController.nextPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.linear),
+                              icon: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 20,
+                                color: primaryColor,
+                              )),
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -97,76 +118,79 @@ class Poster extends StatelessWidget {
                 ),
               )
             : const SizedBox(),
-        UiSpacing.verticalSpacingSmall(),
+        UiSpacing.verticalSpacingTiny(),
         Container(padding: containerPadding, child: ActionRow(post: post))
       ]),
     );
   }
 }
 
-class ActionRow extends StatefulWidget {
+class ActionRow extends StatelessWidget {
   final Post post;
   const ActionRow({Key? key, required this.post}) : super(key: key);
 
   @override
-  State<ActionRow> createState() => _ActionRowState();
-}
-
-class _ActionRowState extends State<ActionRow> {
-  Color likeColor = primaryColor;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<ProfileViewModel>.reactive(
-      viewModelBuilder: () => ProfileViewModel(),
-      onModelReady: (model) => model.getUserInfo(),
-      builder: (context, model, child) {
-        return Row(
-          children: [
-            like(context, model),
-            UiSpacing.horizontalSpacingTiny(),
-            Text(widget.post.likes.length.toString(),
-                style: Theme.of(context).textTheme.bodyText2),
-            const Spacer(),
-            widget.post.content != null ? copy(context) : const SizedBox()
-          ],
-        );
-      },
+    return Row(
+      children: [
+        ViewModelBuilder<ProfileViewModel>.reactive(
+          viewModelBuilder: () => ProfileViewModel(),
+          onModelReady: (model) => model.getUserInfo(),
+          builder: (context, model, child) {
+            if (model.isBusy) {
+              return const SizedBox();
+            }
+
+            return like(context, model);
+          },
+        ),
+        UiSpacing.horizontalSpacingTiny(),
+        Text(post.likes.length.toString(),
+            style: Theme.of(context).textTheme.bodyText2),
+        const Spacer(),
+        post.content != null ? share(context) : const SizedBox()
+      ],
     );
   }
 
-  IconButton copy(BuildContext context) {
+  IconButton share(BuildContext context) {
     return IconButton(
-        onPressed: () => Clipboard.setData(ClipboardData(
-              text: widget.post.content,
-            )).then((_) => Utilities.showSnackBar(context,
-                width: 110, text: 'Text copied!')),
-        icon: const ImageIcon(
-          AssetImage('assets/images/dashboard/copy.png'),
+        onPressed: () async {
+          final List<String> urls = await Utilities.findPath(post.images!);
+          if (post.images != null && post.images!.isNotEmpty) {
+            await Share.shareFiles(urls, text: post.content);
+          } else {
+            await Share.share(post.content!);
+          }
+        },
+
+        // Clipboard.setData(ClipboardData(
+        //       text: post.content,
+        //     )).then((_) => Utilities.showSnackBar(context,
+        //         width: 110, text: 'Text copied!')),
+        icon: const Icon(
+          Icons.share,
           color: primaryColor,
         ));
   }
 
-  IconButton like(BuildContext context, ProfileViewModel model) {
-    return IconButton(
-        onPressed: () => setState(() {
-              widget.post.likes.contains('PedHu77dM0fVk1sGzniCZifIEHf1')
-                  ? widget.post.likes.remove('PedHu77dM0fVk1sGzniCZifIEHf1')
-                  : widget.post.likes.add('PedHu77dM0fVk1sGzniCZifIEHf1');
-            }),
-        icon: ImageIcon(
-            const AssetImage(
-              'assets/images/dashboard/thumbsUp.png',
-            ),
-            color: model.isBusy
-                ? primaryColor
-                : (widget.post.likes.contains(model.user.userId)
-                    ? primaryColor
-                    : scaffoldColor)));
+  Widget like(BuildContext context, ProfileViewModel userModel) {
+    return ViewModelBuilder<PostViewModel>.reactive(
+        viewModelBuilder: () => PostViewModel(),
+        builder: (context, postModel, child) {
+          return IconButton(
+              onPressed: () => postModel.updateLikes(
+                  post: post, currentUserEmail: userModel.user.email),
+              icon: Icon(
+                  // const AssetImage(
+                  //   'assets/images/dashboard/thumbsUp.png',
+                  // ),
+                  postModel.isBusy
+                      ? Icons.thumb_up
+                      : ((post.likes.contains(userModel.user.email)
+                          ? Icons.thumb_up
+                          : Icons.thumb_up_alt_outlined)),
+                  color: primaryColor));
+        });
   }
 }

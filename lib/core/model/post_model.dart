@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class Post {
@@ -15,38 +16,23 @@ class Post {
       required this.date,
       this.images,
       required this.likes});
+
+  factory Post.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    Map? data = doc.data();
+    List<dynamic> fireStoreLikes = data!['likes'];
+    List<dynamic> fireStoreImages = data['images'];
+
+    return Post(
+      postId: data['postId'],
+      category: data['category'],
+      content: data['content'],
+      date: DateTime.fromMillisecondsSinceEpoch(int.parse(data['postId'])),
+      images: fireStoreImages
+          .map((fireStoreImage) => fireStoreImage.toString())
+          .toList(),
+      likes: fireStoreLikes
+          .map((fireStoreLike) => fireStoreLike.toString())
+          .toList(),
+    );
+  }
 }
-
-List<Post> dummyPosts = [
-  Post(
-      postId: '1',
-      category: 'Adolescent Health',
-      content: 'Every day is a good day to be healthy',
-      date: DateTime(2022, 3, 15),
-      images: [
-        'assets/images/dashboard/dummyFamily.png',
-
-        'assets/images/dashboard/dummyFamily.png',
-
-        'assets/images/dashboard/dummyFamily.png',
-        // fit: BoxFit.fitWidth,
-      ],
-      likes: [
-        'PedHu77dM0fVk1sGzniCZifIEHf1'
-      ]),
-  Post(
-      postId: '2',
-      category: 'Family Planning',
-      content: 'Contraceptives are vital in the prevention of pregnancy',
-      date: DateTime(2020, 4, 5),
-      likes: []),
-  Post(
-      postId: '3',
-      category: 'Nutrition',
-      content: 'Eat right, stay healthy. Nothing beats that',
-      images: [
-        'assets/images/dashboard/dummyFamily.png',
-      ],
-      date: DateTime(2021, 3, 15),
-      likes: [])
-];

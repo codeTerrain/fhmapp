@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../core/model/user_model.dart';
 import '../../core/services/authentication_service.dart';
 import '../../core/services/navigation_service.dart';
 import '../../core/services/respository.dart';
@@ -59,6 +61,7 @@ class SignUpViewModel extends MultipleFutureViewModel {
       data['fhmappAdminFor'] = [];
 
       _respository.setUserDetails(data).then((user) {
+        addLoggedinDevice(user);
         _sharedPrefs.setLocalUserData(user);
         _respository.userOnlineState(email: email, online: true);
         _navigationService.navigateTo(Routes.navigation);
@@ -66,6 +69,22 @@ class SignUpViewModel extends MultipleFutureViewModel {
     } else {
       print('Error in registration');
     }
+  }
+
+  addLoggedinDevice(Users user) {
+    final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+    Set<String> loggedInDevices = {};
+    _fcm.getToken().then((token) {
+      if (user.loggedInDevices != null) {
+        loggedInDevices = user.loggedInDevices!.toSet().cast<String>();
+      }
+
+      if (token != null) {
+        loggedInDevices.add(token);
+      }
+      _respository.updateToken(
+          email: user.email, updatedLoggedInDevices: loggedInDevices);
+    });
   }
 
   @override

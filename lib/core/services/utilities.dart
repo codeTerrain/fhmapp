@@ -8,6 +8,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stacked/stacked.dart';
 
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
 import '../../ui/shared/static_lists.dart';
 import '../../ui/shared/style.dart';
 import '../../ui/widgets/buttons.dart';
@@ -42,7 +44,7 @@ class Utilities {
       await ImageCropper().cropImage(
         cropStyle: cropStyle,
         sourcePath: imageFile.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1.1),
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 5),
         aspectRatioPresets: [CropAspectRatioPreset.ratio16x9],
         compressQuality: 60,
         compressFormat: ImageCompressFormat.png,
@@ -60,6 +62,15 @@ class Utilities {
         toolbarWidgetColor: kWhite,
         hideBottomControls: true,
       );
+
+  static Future<List<String>> findPath(List<String> imageUrls) async {
+    List<String> paths = [];
+    for (var imageUrl in imageUrls) {
+      final file = await DefaultCacheManager().getSingleFile(imageUrl);
+      paths.add(file.path);
+    }
+    return paths;
+  }
 
   static tAndC(BuildContext context,
       {String title = '', String description = 'Task Updated Successfully'}) {

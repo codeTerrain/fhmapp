@@ -37,6 +37,8 @@ class ProfileViewModel extends FutureViewModel {
     String dob = await _sharedPrefs.getLocalStorage('dob');
     String profilePicture =
         await _sharedPrefs.getLocalStorage('profilePicture');
+    List<String>? fhmappAdminFor =
+        await _sharedPrefs.getListLocalStorage('fhmappAdminFor');
 
     Users user = Users(
         userId: userId,
@@ -53,6 +55,7 @@ class ProfileViewModel extends FutureViewModel {
         facility: facility,
         region: region,
         userType: userType,
+        fhmappAdminFor: fhmappAdminFor,
         profilePicture: profilePicture);
 
     _user = user;

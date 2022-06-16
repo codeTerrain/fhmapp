@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fhmapp/core/model/facility_model.dart';
+import 'package:fhmapp/core/model/post_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
@@ -217,5 +218,48 @@ class Respository {
             }).toList());
 
     return facilities;
+  }
+
+  Stream<List<Post>> getPosts() {
+    Stream<List<Post>> posts = _db
+        .collection('posts')
+        .orderBy('postId', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((document) {
+              return Post.fromFirestore(document);
+            }).toList());
+
+    return posts;
+  }
+
+  Future<QueryDocumentSnapshot> getPost(String postId) async {
+    QuerySnapshot qs = await _db
+        .collection('posts')
+        .where('postId', isEqualTo: postId)
+        .limit(1)
+        .get();
+
+    return qs.docs.first;
+  }
+
+  updateLikes({
+    required String postId,
+    required String email,
+    required Set<String> updatedLikes,
+  }) async {
+    var postDoc = await getPost(postId);
+    DocumentReference postDocRef = postDoc.reference;
+    List<String>? distinctLikes;
+    // print(updatedLikes);
+    if (!updatedLikes.contains(email)) {
+      List<String> onlinePostLikes = List<String>.from(postDoc['likes']);
+
+      onlinePostLikes.remove(email);
+
+      distinctLikes = onlinePostLikes.toSet().toList();
+    } else {
+      distinctLikes = updatedLikes.toList();
+    }
+    postDocRef.update({'likes': distinctLikes});
   }
 }

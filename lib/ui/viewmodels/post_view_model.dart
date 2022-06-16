@@ -36,7 +36,8 @@ class PostViewModel extends MultipleFutureViewModel {
         'category': category,
         'content': content,
         'images': imageUrls,
-        'creator': creator
+        'creator': creator,
+        'likes': []
       };
       notifyListeners();
       runBusyFuture(
@@ -45,6 +46,22 @@ class PostViewModel extends MultipleFutureViewModel {
       //_imageUrls.add(downloadURL);
       print(imageUrls);
     }
+  }
+
+  updateLikes({required Post post, required String currentUserEmail}) {
+    Set<String> likes = {};
+
+    likes = post.likes.toSet().cast<String>();
+    if (likes.contains(currentUserEmail)) {
+      print('true');
+      likes.remove(currentUserEmail);
+    } else {
+      print('false');
+      likes.add(currentUserEmail);
+    }
+
+    _respository.updateLikes(
+        postId: post.postId, email: currentUserEmail, updatedLikes: likes);
   }
 
   // Future uploadFile() async {
