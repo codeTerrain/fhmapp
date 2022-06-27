@@ -81,6 +81,7 @@ class SliverInfoAppBar extends StatelessWidget {
   final Widget? title;
   final Widget? subTitle;
   final Color? backgroundColor;
+  final double? titleSpacing;
   final Widget? trailing;
   final PreferredSizeWidget? bottom;
   const SliverInfoAppBar(
@@ -89,6 +90,7 @@ class SliverInfoAppBar extends StatelessWidget {
       this.backgroundColor,
       required this.title,
       this.bottom,
+      this.titleSpacing = 15,
       this.subTitle})
       : super(key: key);
 
@@ -104,7 +106,7 @@ class SliverInfoAppBar extends StatelessWidget {
       leadingWidth: 0,
       elevation: 0,
       toolbarHeight: bottom != null ? 120 : 80,
-      titleSpacing: 15,
+      titleSpacing: titleSpacing,
       bottom: bottom,
       title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(

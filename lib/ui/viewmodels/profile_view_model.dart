@@ -67,6 +67,7 @@ class ProfileViewModel extends FutureViewModel {
   changeProfileImage() async {
     File localFile;
     final CroppedFile? pickedFile = await Utilities.pickMedia(
+      fileSize: 0.7,
       isGallery: true,
       cropImage: (croppedFile) =>
           Utilities.cropSquareImage(croppedFile, CropStyle.circle),

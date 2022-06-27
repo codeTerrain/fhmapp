@@ -60,10 +60,7 @@ class Poster extends StatelessWidget {
                             fit: BoxFit.fitWidth,
                             progressIndicatorBuilder:
                                 (context, url, downloadProgress) =>
-                                    LinearProgressIndicator(
-                              value: downloadProgress.progress,
-                              color: secondary1,
-                            ),
+                                    linearProgressIndicator(downloadProgress),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
                           ),
@@ -141,7 +138,7 @@ class ActionRow extends StatelessWidget {
               return const SizedBox();
             }
 
-            return like(context, model);
+            return like(model);
           },
         ),
         UiSpacing.horizontalSpacingTiny(),
@@ -174,7 +171,7 @@ class ActionRow extends StatelessWidget {
         ));
   }
 
-  Widget like(BuildContext context, ProfileViewModel userModel) {
+  Widget like(ProfileViewModel userModel) {
     return ViewModelBuilder<PostViewModel>.reactive(
         viewModelBuilder: () => PostViewModel(),
         builder: (context, postModel, child) {

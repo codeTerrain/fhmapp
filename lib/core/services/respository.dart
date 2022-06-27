@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fhmapp/core/model/events.dart';
 import 'package:fhmapp/core/model/facility_model.dart';
 import 'package:fhmapp/core/model/post_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -130,8 +131,8 @@ class Respository {
     }
   }
 
-  Future addPost(Map<String, dynamic> postItem) async {
-    var addPost = _db.collection('posts').doc();
+  Future addPost(Map<String, dynamic> postItem, String collectionName) async {
+    var addPost = _db.collection(collectionName).doc();
 
     return _db.runTransaction((transaction) async {
       transaction.set(
@@ -160,6 +161,19 @@ class Respository {
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((document) => ChatItemModel.fromFirestore(document))
+            .toList());
+
+    return query;
+  }
+
+  Stream<List<Event>> getEventRegisteredUsers(String eventId) {
+    Stream<List<Event>> query = _db
+        .collection('events')
+        .where('id', isEqualTo: eventId)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((document) => Event.fromFirestore(document))
             .toList());
 
     return query;
@@ -232,10 +246,32 @@ class Respository {
     return posts;
   }
 
+  Stream<List<Event>> getEvents() {
+    Stream<List<Event>> events = _db
+        .collection('events')
+        .orderBy('id', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((document) {
+              return Event.fromFirestore(document);
+            }).toList());
+
+    return events;
+  }
+
   Future<QueryDocumentSnapshot> getPost(String postId) async {
     QuerySnapshot qs = await _db
         .collection('posts')
         .where('postId', isEqualTo: postId)
+        .limit(1)
+        .get();
+
+    return qs.docs.first;
+  }
+
+  Future<QueryDocumentSnapshot> getEvent(String eventId) async {
+    QuerySnapshot qs = await _db
+        .collection('events')
+        .where('id', isEqualTo: eventId)
         .limit(1)
         .get();
 
@@ -261,5 +297,27 @@ class Respository {
       distinctLikes = updatedLikes.toList();
     }
     postDocRef.update({'likes': distinctLikes});
+  }
+
+  updateEventAttendees({
+    required String eventId,
+    required String email,
+    required Set<String> updatedAtendees,
+  }) async {
+    var eventDoc = await getEvent(eventId);
+    DocumentReference eventDocRef = eventDoc.reference;
+    List<String>? distinctAttendees;
+    // print(updatedLikes);
+    if (!updatedAtendees.contains(email)) {
+      List<String> onlineRegisteredUsers =
+          List<String>.from(eventDoc['registeredUsers']);
+
+      onlineRegisteredUsers.remove(email);
+
+      distinctAttendees = onlineRegisteredUsers.toSet().toList();
+    } else {
+      distinctAttendees = updatedAtendees.toList();
+    }
+    eventDocRef.update({'registeredUsers': distinctAttendees});
   }
 }

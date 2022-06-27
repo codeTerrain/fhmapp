@@ -4,8 +4,6 @@ import '../shared/static_lists.dart';
 import '../widgets/appbars.dart';
 import '../widgets/misc.dart';
 import '../widgets/tiles.dart';
-import 'image.dart';
-import 'resources.dart';
 
 class SchoolClinic extends StatelessWidget {
   const SchoolClinic({Key? key}) : super(key: key);
@@ -21,7 +19,7 @@ class SchoolClinic extends StatelessWidget {
               'School Clinic',
               style: Theme.of(context).textTheme.headline5,
             ),
-            trailing: drawerCaller(context),
+            //  trailing: drawerCaller(context),
           ),
 
           SliverPadding(
@@ -31,18 +29,19 @@ class SchoolClinic extends StatelessWidget {
                 (context, index) {
                   return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: ProgramTile(index,
-                          text: schoolClinic.values.toList()[index],
-                          onTap: () => null,
-                          // Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute<void>(
-                          //         builder: (BuildContext context) => MyHomePage(
-                          //           title: 'Image View',
-                          //         ),
-                          //       ),
-                          //     )
-                              ));
+                      child: ProgramTile(
+                        index,
+                        text: schoolClinic.values.toList()[index],
+                        onTap: () => null,
+                        // Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute<void>(
+                        //         builder: (BuildContext context) => MyHomePage(
+                        //           title: 'Image View',
+                        //         ),
+                        //       ),
+                        //     )
+                      ));
                 },
                 childCount: 4,
               ),

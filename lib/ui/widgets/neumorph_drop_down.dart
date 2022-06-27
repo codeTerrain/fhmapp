@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 
 import 'misc.dart';
 
-class NeumorphDropDown extends StatelessWidget {
-  final List<String> dropItems;
+class NeumorphDropDown<T> extends StatelessWidget {
+  final List<T> dropItems;
   final BuildContext context;
-  final String? value;
+  final T? value;
   final String hintText;
   final double width;
   final Widget prefixIcon;
-  final Function(String?)? onChanged;
+  final Function(T?)? onChanged;
   const NeumorphDropDown(this.context,
       {Key? key,
       required this.dropItems,
@@ -35,7 +35,7 @@ class NeumorphDropDown extends StatelessWidget {
             BoxShadow(
                 offset: const Offset(1, 3), color: extraGrey, blurRadius: 5)
           ]),
-      child: DropdownButton<String>(
+      child: DropdownButton<T>(
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down_outlined),
         value: value,
@@ -56,10 +56,10 @@ class NeumorphDropDown extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyText1,
         underline: const SizedBox(),
         onChanged: onChanged,
-        items: dropItems.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
+        items: dropItems.map<DropdownMenuItem<T>>((T value) {
+          return DropdownMenuItem<T>(
             value: value,
-            child: Text(value),
+            child: Text(value.toString()),
           );
         }).toList(),
       ),

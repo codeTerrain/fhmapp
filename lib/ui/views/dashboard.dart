@@ -10,6 +10,7 @@ import '../viewmodels/profile_view_model.dart';
 import '../widgets/appbars.dart';
 import '../widgets/misc.dart';
 import '../widgets/poster.dart';
+import 'create_post.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -80,7 +81,11 @@ class _DashboardState extends State<Dashboard> {
                         }
                         return (model.user.fhmappAdminFor != null &&
                                 model.user.fhmappAdminFor!.isNotEmpty)
-                            ? newPostCaller(context, model.user.fhmappAdminFor)
+                            ? newPostCaller(
+                                context,
+                                model.user.fhmappAdminFor,
+                                CreatePost(
+                                    fhmappAdminFor: model.user.fhmappAdminFor))
                             : const SizedBox();
                       }),
                 ),

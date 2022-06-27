@@ -46,12 +46,14 @@ class ButtonWrapper extends StatelessWidget {
     Key? key,
     required this.buttonText,
     required this.onPressed,
+    this.color = primaryColor,
     this.trailing,
   }) : super(key: key);
 
   final String buttonText;
   final VoidCallback? onPressed;
   final Widget? trailing;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +62,7 @@ class ButtonWrapper extends StatelessWidget {
       height: 45,
       text: buttonText,
       isRounded: false,
-      buttonColor: primaryColor,
+      buttonColor: color,
       trailing: trailing,
       onPressed: onPressed,
     );

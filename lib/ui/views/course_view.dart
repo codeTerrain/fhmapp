@@ -32,7 +32,7 @@ class _CourseViewState extends State<CourseView> {
             }),
             onPageFinished: (loadedPageUrl) async {
               if (loadedPageUrl ==
-                  'http://46.101.235.240/ghslearning/login/index.php') {
+                  'http://ghsvirtualplatform.com/login/index.php') {
                 controller.runJavascript(
                     "document.getElementById('username').value='${model.elearnUsername}'");
                 controller.runJavascript(

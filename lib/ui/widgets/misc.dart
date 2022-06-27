@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fhmapp/ui/views/create_post.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../shared/routes.dart';
@@ -33,6 +35,9 @@ var roundedListTileBorder = RoundedRectangleBorder(
   borderRadius: BorderRadius.circular(15.0),
 );
 
+String eventDateFormat(DateTime date) =>
+    DateFormat('EEE, MMM d, ' 'y' ' H:m').format(date);
+
 const mainPadding = EdgeInsets.only(left: 15, right: 18);
 
 var boxDecoration =
@@ -56,7 +61,8 @@ Container drawerCaller(BuildContext context) {
   );
 }
 
-Container newPostCaller(BuildContext context, List<String>? fhmappAdminFor) {
+Container newPostCaller(
+    BuildContext context, List<String>? fhmappAdminFor, Widget widget) {
   return Container(
     margin: const EdgeInsets.only(left: 10),
     width: 50,
@@ -65,14 +71,21 @@ Container newPostCaller(BuildContext context, List<String>? fhmappAdminFor) {
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) =>
-              CreatePost(fhmappAdminFor: fhmappAdminFor),
+          builder: (BuildContext context) => widget,
         ),
       ),
       icon: Image.asset('assets/images/dashboard/newPost.png'),
       color: primaryColor,
     ),
     decoration: boxDecoration,
+  );
+}
+
+LinearProgressIndicator linearProgressIndicator(
+    DownloadProgress downloadProgress) {
+  return LinearProgressIndicator(
+    value: downloadProgress.progress,
+    color: secondary1,
   );
 }
 
@@ -87,12 +100,15 @@ const circularProgressIndicator = SliverToBoxAdapter(
 );
 
 Container programmeTag(BuildContext context,
-    {required String text, TextStyle? style, double? margin}) {
+    {required String text,
+    TextStyle? style,
+    Color? color = grey,
+    double? margin}) {
   return Container(
     margin: EdgeInsets.symmetric(horizontal: margin ?? 12),
     padding: containerPadding.copyWith(top: 4, bottom: 4),
     decoration:
-        BoxDecoration(color: grey, borderRadius: BorderRadius.circular(30)),
+        BoxDecoration(color: color, borderRadius: BorderRadius.circular(30)),
     child: Text(
       text,
       style: style,
@@ -151,12 +167,14 @@ String formatTime(DateTime dateTime) {
 dobSelector(
     {String hintText = 'Select Date of Birth',
     required BuildContext context,
+    Color? borderColor,
     required TextEditingController controller,
     required onTap}) {
   return GestureDetector(
     onTap: onTap,
     child: CustomTextField(
         enabled: false,
+        borderColor: borderColor,
         suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded),
         width: UiSpacing.screenSize(context).width,
         prefixIcon: Icon(

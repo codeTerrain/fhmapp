@@ -1,5 +1,6 @@
 class Dropper {
   static List<String> gender = ['Male', 'Female'];
+  static List<bool> chioce = [true, false];
 
   static Map<String, List<String>> regions = {
     'Select Region': [],

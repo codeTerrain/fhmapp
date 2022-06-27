@@ -21,6 +21,11 @@ class SharedPrefs {
     prefs?.setString(key, value);
   }
 
+  Future<bool?> containsKey(String key) async {
+    prefs = await SharedPreferences.getInstance();
+    return prefs?.containsKey(key);
+  }
+
   Future<void> setListLocalStorage(String key, List<String> value) async {
     prefs = await SharedPreferences.getInstance();
     prefs?.setStringList(key, value);

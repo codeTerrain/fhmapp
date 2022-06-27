@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:fhmapp/ui/shared/spacing.dart';
 import 'package:fhmapp/ui/viewmodels/user_action_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -17,6 +19,7 @@ import '../../ui/widgets/misc.dart';
 
 class Utilities {
   static Future<CroppedFile?> pickMedia({
+    required double fileSize,
     required bool isGallery,
     required Future<CroppedFile?> Function(CroppedFile file) cropImage,
   }) async {
@@ -30,8 +33,9 @@ class Utilities {
     final bytes = File(pickedFile.path).readAsBytesSync().lengthInBytes;
     final kb = bytes / 1024;
     final mb = kb / 1024;
-    if (mb > 0.7) {
-      Fluttertoast.showToast(msg: 'Select an image less than 700kb');
+    if (mb > fileSize) {
+      Fluttertoast.showToast(
+          msg: 'Select an image less than ${fileSize.toString()}mb');
       return null;
     }
     final file = CroppedFile(pickedFile.path);
@@ -40,13 +44,15 @@ class Utilities {
   }
 
   static Future<CroppedFile?> cropSquareImage(
-          CroppedFile imageFile, CropStyle cropStyle) async =>
+          CroppedFile imageFile, CropStyle cropStyle,
+          {CropAspectRatio cropAspectRatio =
+              const CropAspectRatio(ratioX: 4, ratioY: 5)}) async =>
       await ImageCropper().cropImage(
         cropStyle: cropStyle,
         sourcePath: imageFile.path,
-        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 5),
+        aspectRatio: cropAspectRatio,
         aspectRatioPresets: [CropAspectRatioPreset.ratio16x9],
-        compressQuality: 60,
+        //   compressQuality: 60,
         compressFormat: ImageCompressFormat.png,
         uiSettings: [androidUiSettingsLocked(), iosUiSettingsLocked()],
       );
@@ -63,6 +69,18 @@ class Utilities {
         hideBottomControls: true,
       );
 
+  static Future<File?> compressFile(File file) async {
+    final filePath = file.absolute.path;
+
+    final splitted = filePath.substring(1);
+    final outPath = "${splitted}_out.jpeg";
+    var result = await FlutterImageCompress.compressAndGetFile(
+        file.absolute.path, outPath,
+        quality: 50, format: CompressFormat.jpeg);
+
+    return result;
+  }
+
   static Future<List<String>> findPath(List<String> imageUrls) async {
     List<String> paths = [];
     for (var imageUrl in imageUrls) {
@@ -71,6 +89,11 @@ class Utilities {
     }
     return paths;
   }
+
+  static String toDate(DateTime dateTime) =>
+      DateFormat.yMMMEd().format(dateTime);
+
+  static String toTime(DateTime dateTime) => DateFormat.Hm().format(dateTime);
 
   static tAndC(BuildContext context,
       {String title = '', String description = 'Task Updated Successfully'}) {

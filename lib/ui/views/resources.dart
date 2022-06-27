@@ -10,6 +10,9 @@ import 'package:open_file/open_file.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../core/model/resource_model.dart';
+import '../../core/services/respository.dart';
+import '../../core/services/shared_preferences.dart';
+import '../../locator.dart';
 import '../shared/style.dart';
 import '../widgets/misc.dart';
 
@@ -44,6 +47,7 @@ class Resources extends StatelessWidget {
               onModelReady: (model) => model.getAllResources(categoryKey),
               builder: (context, model, child) {
                 List<Resource> allResources = model.resources;
+
                 return SliverPadding(
                     padding: mainPadding,
                     sliver: SliverList(
@@ -102,6 +106,7 @@ class Downloader extends StatefulWidget {
 
 class _DownloaderState extends State<Downloader> {
   late String _downloadProgress;
+  final SharedPrefs _sharedPrefs = locator<SharedPrefs>();
 
   downloadResource(BuildContext context, Resource resource) async {
     var dio = Dio();
@@ -119,18 +124,25 @@ class _DownloaderState extends State<Downloader> {
       } else {
         String url = resource.path;
 
-        await dio.download(
-          url,
-          fullpath,
-          onReceiveProgress: (received, total) {
-            if (total != -1) {
-              setState(() {
-                _downloadProgress =
-                    (received / total * 100).toStringAsFixed(0) + "%";
-              });
-            }
-          },
-        );
+        await dio
+            .download(
+              url,
+              fullpath,
+              onReceiveProgress: (received, total) {
+                if (total != -1) {
+                  setState(() {
+                    _downloadProgress =
+                        (received / total * 100).toStringAsFixed(0) + "%";
+                  });
+                }
+              },
+            )
+            .then((value) async =>
+                await _sharedPrefs.setLocalStorage(resource.id!, resource.name))
+            .onError((e, s) {
+              print(e);
+              return;
+            });
 
         OpenFile.open(fullpath);
         ScaffoldMessenger.of(context)

@@ -19,7 +19,7 @@ class Profile extends StatelessWidget {
           'Profile',
           style: Theme.of(context).textTheme.headline5,
         ),
-        trailing: drawerCaller(context),
+        // trailing: drawerCaller(context),
       ),
       body: SingleChildScrollView(
         physics: scrollPhysics,

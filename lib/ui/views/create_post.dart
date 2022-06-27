@@ -164,6 +164,7 @@ class _CreatePostState extends State<CreatePost> {
 
   Future buttonClicked(bool isGallery) async {
     final CroppedFile? file = await Utilities.pickMedia(
+      fileSize: 3.0,
       isGallery: isGallery,
       cropImage: (croppedFile) =>
           Utilities.cropSquareImage(croppedFile, CropStyle.rectangle),
@@ -171,7 +172,8 @@ class _CreatePostState extends State<CreatePost> {
 
     if (imageFiles.length < 4) {
       if (file == null) return;
-      setState(() => imageFiles.add(File(file.path)));
+      var compressedFile = await Utilities.compressFile(File(file.path));
+      setState(() => imageFiles.add(compressedFile!));
     } else {
       return;
     }

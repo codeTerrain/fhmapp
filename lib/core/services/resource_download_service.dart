@@ -9,17 +9,21 @@ import 'package:stacked/stacked.dart';
 import 'package:path/path.dart';
 
 import '../../locator.dart';
+import 'shared_preferences.dart';
 
 class ResourceService extends BaseViewModel {
   final Respository _respository = locator<Respository>();
 
+  final SharedPrefs _sharedPrefs = locator<SharedPrefs>();
+
   final List<Resource> _resources = [];
   List<Resource> get resources => _resources;
+  static const String source =
+      r'.docx|.svg|.doc|.txt|.pptx|.html|.jpeg|.jpg|.png|.gif|.pdf|.xlsx|.ppt|.tiff|.mp4|.mpeg|.webm|.mov|.avi|.wmv|.flv|.mkv|.mp3|.wav|.ogg|.wma|.aac';
 
   static String getFileName(Reference file) {
     String fileName = file.name.splitMapJoin(
-      RegExp(
-          r'.docx|.doc|.txt|.pptx|.html|.jpeg|.jpg|.png|.gif|.pdf|.xlsx|.ppt|.tiff'),
+      RegExp(source),
       onMatch: (matchedString) => '',
     );
     return fileName;
@@ -27,8 +31,7 @@ class ResourceService extends BaseViewModel {
 
   static String getDownloadaedFileName(String path) {
     String fileName = path.splitMapJoin(
-      RegExp(
-          r'.docx|.svg|.doc|.txt|.pptx|.html|.jpeg|.jpg|.png|.gif|.pdf|.xlsx|.ppt|.tiff'),
+      RegExp(source),
       onMatch: (matchedString) => '',
     );
     return fileName;
@@ -68,6 +71,7 @@ class ResourceService extends BaseViewModel {
         'extension': getFileExtension(doc.path.split('/').last),
         'isRemote': false
       };
+
       offlineList.add(Resource.fromAPI(data));
     }
     _resources.insertAll(_resources.length, offlineList);
@@ -77,25 +81,36 @@ class ResourceService extends BaseViewModel {
     var onlineResources = await _respository.getResources(category);
     if (onlineResources is QuerySnapshot) {
       List<DocumentSnapshot> docs = onlineResources.docs;
-      List<Resource> onlineList = [];
 
       for (var doc in docs) {
-        Map<String, Object> data = {
-          'path': doc['path'],
-          'name': doc['name'],
-          'category': doc['category'],
-          'extension': doc['extension'],
-          'isRemote': true
-        };
-        onlineList.add(Resource.fromAPI(data));
-
-//check (by name) if online document has already been downloaded
-        var downloadedResource =
-            _resources.where((resource) => resource.name == doc['name']);
-
-        if (downloadedResource.isEmpty) {
-          _resources.add(Resource.fromAPI(data));
+        bool? docContainsKey = await _sharedPrefs.containsKey(doc['id']);
+        if (docContainsKey is bool) {
+          print(await _sharedPrefs.getLocalStorage('2'));
+          if (!docContainsKey) {
+            //     print(doc['id']);
+            Map<String, Object> data = {
+              'id': doc['id'],
+              'path': doc['path'],
+              'name': doc['name'],
+              'category': doc['category'],
+              'extension': doc['extension'],
+              'isRemote': true
+            };
+            _resources.add(Resource.fromAPI(data));
+          }
         }
+
+//check (by id) if online document has already been downloaded
+
+        // var downloadedResource = _resources.where((resource) {
+        //   _sharedPrefs.getLocalStorage(resource.id);
+        //   return resource.id == doc['id'];
+        // });
+        // //     print('thh $downloadedResource');
+
+        // if (downloadedResource.isEmpty) {
+        //   _resources.add(Resource.fromAPI(data));
+        // }
       }
 
       notifyListeners();

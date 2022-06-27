@@ -44,19 +44,21 @@ const String privacyPolicy =
 List<Program> programList = List.generate(
     programs.length,
     (index) => Program(
-          id: programs.keys.toList()[index],
+          id: programs.values.toList()[index],
           name: programs[programs.keys.toList()[index]]!,
           image: 'assets/images/dashboard/dummyFamily.png',
         ));
-List<Event> eventList = List.generate(
-    programs.length,
-    (index) => Event(
-        id: programs.keys.toList()[index],
-        name: programs[programs.keys.toList()[index]]!,
-        image: 'assets/images/dashboard/dummyFamily.png',
-        programmeId: [programs.keys.toList()[index]],
-        description: 'This is description $index',
-        endDate: DateTime.now(),
-        startDate: DateTime.now(),
-        isAttendable: true,
-        registeredUsers: []));
+// List<Event> eventList = List.generate(
+//     programs.length,
+//     (index) => Event(
+//         id: programs.keys.toList()[index],
+//         name: programs[programs.keys.toList()[index]]!,
+//         image: 'assets/images/dashboard/dummyFamily.png',
+//         programmeId: [programs.keys.toList()[index]],
+//         programmeTag: programs.keys.toList()[index],
+//         description:
+//             'The standard Lorem Ipsum passage, used since the 1500s Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  $index',
+//         endDate: DateTime.now(),
+//         startDate: DateTime.now(),
+//         isAttendable: true,
+//         registeredUsers: []));

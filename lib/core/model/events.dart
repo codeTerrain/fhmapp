@@ -1,43 +1,51 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Event {
   String id;
-  List<String> programmeId;
-  String name;
-  String? description;
-  String? image;
-  bool isAttendable;
-  List<User>? registeredUsers;
-  DateTime? startDate;
-  DateTime? endDate;
-  String? location;
-  String? organizedBy;
+  //use [programmeId] if upon consultation, an event can span over multiple programmes
+  //List<String> programmeId;
+  final String programmeTag;
+  final String name;
+  final String? description;
+  final String? image;
+  final bool isAttendable;
+  final List<String> registeredUsers;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String? location;
+  final String? organizedBy;
   Event(
       {required this.id,
-      required this.programmeId,
+
+      /// required this.programmeId,
+      required this.programmeTag,
       required this.name,
       this.description,
       this.image,
       this.isAttendable = false,
-      this.startDate,
+      required this.startDate,
       this.location,
       this.organizedBy,
-      this.endDate,
-      this.registeredUsers});
+      required this.endDate,
+      required this.registeredUsers});
 
   factory Event.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
+    List<dynamic> registeredUsers = data['registeredUsers'];
     return Event(
       id: data['id'],
-      programmeId: data['programmeId'],
+      //programmeId: data['programmeId'],
+      programmeTag: data['programmeTag'],
       name: data['name'],
       description: data['description'],
       image: data['image'],
       isAttendable: data['isAttendable'],
-      registeredUsers: data['registeredUsers'],
-      startDate: data['startDate'],
-      endDate: data['endDate'],
+      registeredUsers: registeredUsers
+          .map((registeredUser) => registeredUser.toString())
+          .toList(),
+      startDate: data['startDate'].toDate(),
+
+      endDate: data['endDate'].toDate(),
       location: data['location'],
       organizedBy: data['organizedBy'],
     );
@@ -45,14 +53,15 @@ class Event {
   factory Event.fromAPI(Map data) {
     return Event(
       id: data['id'],
-      programmeId: data['programmeId'],
+      // programmeId: data['programmeId'],
       name: data['name'],
+      programmeTag: data['programmeTag'],
       description: data['description'],
       image: data['image'],
       isAttendable: data['isAttendable'],
       registeredUsers: data['registeredUsers'],
-      startDate: data['startDate'],
-      endDate: data['endDate'],
+      startDate: data['startDate'].toDate(),
+      endDate: data['endDate'].toDate(),
       location: data['location'],
       organizedBy: data['organizedBy'],
     );

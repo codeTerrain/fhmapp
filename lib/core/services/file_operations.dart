@@ -27,7 +27,7 @@ class FileOperations {
 
   static Future deleteFile(String destination, String url) async {
     try {
-      void reference = await FirebaseStorage.instance.refFromURL(url).delete();
+      await FirebaseStorage.instance.refFromURL(url).delete();
 
       return true;
     } on FirebaseException catch (e) {

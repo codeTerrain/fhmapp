@@ -19,7 +19,6 @@ class MedicalScreening extends StatelessWidget {
               'Medical Screening',
               style: Theme.of(context).textTheme.headline5,
             ),
-            trailing: drawerCaller(context),
           ),
 
           SliverPadding(

@@ -40,11 +40,9 @@ class PostViewModel extends MultipleFutureViewModel {
         'likes': []
       };
       notifyListeners();
-      runBusyFuture(
-          _respository.addPost(postItem).then((value) => imageUrls.clear()));
-
-      //_imageUrls.add(downloadURL);
-      print(imageUrls);
+      runBusyFuture(_respository
+          .addPost(postItem, 'posts')
+          .then((value) => imageUrls.clear()));
     }
   }
 
@@ -53,10 +51,8 @@ class PostViewModel extends MultipleFutureViewModel {
 
     likes = post.likes.toSet().cast<String>();
     if (likes.contains(currentUserEmail)) {
-      print('true');
       likes.remove(currentUserEmail);
     } else {
-      print('false');
       likes.add(currentUserEmail);
     }
 

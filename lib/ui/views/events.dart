@@ -1,15 +1,24 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dash_chat/dash_chat.dart';
 import 'package:fhmapp/core/model/events.dart';
 import 'package:fhmapp/core/model/program_model.dart';
 import 'package:fhmapp/ui/shared/spacing.dart';
 import 'package:fhmapp/ui/shared/style.dart';
-import 'package:fhmapp/ui/widgets/buttons.dart';
+import 'package:fhmapp/ui/views/event_details.dart';
 import 'package:flutter/material.dart';
+import 'package:stacked/stacked.dart';
 
+import '../../core/services/respository.dart';
+import '../../locator.dart';
 import '../shared/static_lists.dart';
+import '../viewmodels/profile_view_model.dart';
 import '../widgets/appbars.dart';
+import '../widgets/cached_image.dart';
 import '../widgets/change_info.dart';
 import '../widgets/misc.dart';
 import '../widgets/search.dart';
+import 'create_event.dart';
 
 class Events extends StatefulWidget {
   const Events({Key? key}) : super(key: key);
@@ -19,10 +28,22 @@ class Events extends StatefulWidget {
 }
 
 class _EventsState extends State<Events> {
-  List<String> filterTag = ['Tags:'];
+  String? _filter;
+
+  final TextEditingController _searchController = TextEditingController();
+
+  final Respository _respository = locator<Respository>();
+
+  String? _selectedTag;
+  int? _selectedIndex;
 
   @override
   void initState() {
+    _searchController.addListener(() {
+      setState(() {
+        _filter = _searchController.text;
+      });
+    });
     super.initState();
   }
 
@@ -39,130 +60,133 @@ class _EventsState extends State<Events> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: InfoAppBar(
-          title: Text(
-            'Events',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          trailing: drawerCaller(context),
-          bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(20.0),
-              child: Padding(
-                  padding: mainPadding,
-                  child: search(context, hintText: 'Search'))),
-        ),
         body: Padding(
-            padding: mainPadding,
-            child: SingleChildScrollView(
-              physics: scrollPhysics,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  UiSpacing.verticalSpacingMedium(),
-                  Text(
-                    'Categories',
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline5
-                        ?.copyWith(color: kBlack),
-                  ),
-                  SizedBox(
-                    height: 193,
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) =>
-                          UiSpacing.horizontalSpacingSmall(),
-                      //  shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      physics: scrollPhysics,
-                      itemCount: programList.length,
-                      itemBuilder: (BuildContext context, index) {
-                        return GestureDetector(
-                          child: Stack(
-                            key: ValueKey(programList[index].id),
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              FittedBox(
-                                child: Image.asset(
-                                  programList[index].image,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: mainPadding,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      color: programList[index].isSelected
-                                          ? primaryColor.withAlpha(221)
-                                          : grey.withAlpha(221),
-                                      borderRadius: const BorderRadius.vertical(
-                                          bottom: Radius.circular(10))),
-                                  child: Text(
-                                    programList[index].name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline3
-                                        ?.copyWith(color: kWhite),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          onTap: () {
-                            setState(() {
-                              programList[index].isSelected =
-                                  !programList[index].isSelected;
-                              if (programList[index].isSelected) {
-                                filterTag.add(programList[index].id);
-                              } else {
-                                filterTag.remove(programList[index].id);
-                              }
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  UiSpacing.verticalSpacingSemilarge(),
-                  Text(
-                    (filterTag.length == 1 || filterTag.length == 5)
-                        ? 'All'
-                        : filterTag.toString(),
-                    style: (filterTag.length == 1 || filterTag.length == 5)
-                        ? Theme.of(context)
-                            .textTheme
-                            .headline5
-                            ?.copyWith(color: kBlack)
-                        : Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            ?.copyWith(color: kBlack),
-                  ),
-                  ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        for (var x in filterTag) {
-                          if (eventList[index].programmeId.contains(x) ||
-                              filterTag.length == 1) {
-                            return EventCard(event: eventList[index]);
-                          }
-                        }
-                        return const SizedBox();
-                      },
-                      itemCount: eventList.length)
-                ],
-              ),
-            )));
+      padding: mainPadding,
+      child: CustomScrollView(
+        physics: scrollPhysics,
+        //crossAxisAlignment: CrossAxisAlignment.start,
+        slivers: [
+          SliverInfoAppBar(
+            titleSpacing: 0,
+            title: Text(
+              'Events',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            trailing: ViewModelBuilder<ProfileViewModel>.reactive(
+                viewModelBuilder: () => ProfileViewModel(),
+                onModelReady: (model) => model.getUserInfo(),
+                builder: (context, model, child) {
+                  if (model.isBusy) {
+                    return const SizedBox();
+                  }
+
+                  return (model.user.fhmappAdminFor != null &&
+                          model.user.fhmappAdminFor!.isNotEmpty)
+                      ? newPostCaller(
+                          context,
+                          model.user.fhmappAdminFor,
+                          CreateEvent(
+                              fhmappAdminFor: model.user.fhmappAdminFor))
+                      : const SizedBox();
+                }),
+            bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(20.0),
+                child: search(context,
+                    hintText: 'Search', controller: _searchController)),
+          ),
+          SliverToBoxAdapter(
+            child: UiSpacing.verticalSpacingMedium(),
+          ),
+          SliverToBoxAdapter(
+            child: Text(
+              'Categories',
+              style: Theme.of(context)
+                  .textTheme
+                  .headline5
+                  ?.copyWith(color: kBlack),
+            ),
+          ),
+          SliverToBoxAdapter(child: _buildChoiceChips()),
+          SliverToBoxAdapter(child: UiSpacing.verticalSpacingSmall()),
+          StreamBuilder<List<Event>>(
+              stream: _respository.getEvents(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return SliverToBoxAdapter(
+                      child: Center(child: Text('Error: ${snapshot.error}')));
+                }
+                if (!snapshot.hasData) {
+                  return const SliverToBoxAdapter(
+                      child: Center(child: Text('Loading...')));
+                }
+                List<Event> events = snapshot.data!
+                    .where((event) => event.startDate.isAfter(DateTime.now()))
+                    .toList();
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    if ((_filter == null ||
+                            events[index]
+                                .description!
+                                .toLowerCase()
+                                .contains(_filter!.toLowerCase()) ||
+                            _filter == null ||
+                            events[index]
+                                .programmeTag
+                                .toLowerCase()
+                                .contains(_filter!.toLowerCase())) &&
+                        (_selectedTag == null ||
+                            events[index]
+                                .programmeTag
+                                .toLowerCase()
+                                .contains(_selectedTag!.toLowerCase()))) {
+                      return EventCard(event: events[index]);
+                    }
+
+                    return const SizedBox();
+                  }, childCount: events.length),
+                );
+              })
+        ],
+      ),
+    ));
+  }
+
+  Widget _buildChoiceChips() {
+    return SizedBox(
+      height: 50,
+      child: ListView.separated(
+        separatorBuilder: (context, index) => UiSpacing.horizontalSpacingTiny(),
+        physics: scrollPhysics,
+        scrollDirection: Axis.horizontal,
+        itemCount: programList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ChoiceChip(
+            label: Text(programList[index].name),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+            selected: _selectedIndex == index,
+            selectedColor: secondary1,
+            onSelected: (bool selected) {
+              setState(() {
+                _selectedIndex = selected ? index : null;
+
+                _selectedTag =
+                    _selectedIndex == null ? null : programList[index].id;
+              });
+            },
+            backgroundColor: kWhite,
+            shape: RoundedRectangleBorder(borderRadius: generalBorderRadius),
+            labelStyle:
+                Theme.of(context).textTheme.bodyText2?.copyWith(color: kBlack),
+          );
+        },
+      ),
+    );
   }
 }
 
 class EventCard extends StatelessWidget {
   final Event event;
+
   const EventCard({
     required this.event,
     Key? key,
@@ -179,21 +203,7 @@ class EventCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: UiSpacing.screenSize(context).width,
-                height: 100,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(10),
-                  ),
-                  child: event.image == null
-                      ? const SizedBox()
-                      : Image.asset(
-                          event.image!,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
+              CachedImage(image: event.image),
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: RichText(
@@ -201,7 +211,9 @@ class EventCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textScaleFactor: 1.2,
                   text: TextSpan(
-                    text: event.startDate.toString() + '\n',
+                    text: eventDateFormat(event.startDate) + '\n',
+
+                    //formatTime(event.startDate!) + '\n',
                     //  text: 'THU, 13th JUN, 2022\n',
                     style: Theme.of(context)
                         .textTheme
@@ -220,14 +232,19 @@ class EventCard extends StatelessWidget {
                 ),
               ),
               UiSpacing.verticalSpacingSmall(),
-              const ButtonWrapper(
+              ButtonWrapper(
                 buttonText: 'Viev Event Info',
-                trailing: ImageIcon(
+                trailing: const ImageIcon(
                   AssetImage('assets/images/general/doubleArrow.png'),
                   size: 20,
                   color: kWhite,
                 ),
-                onPressed: null,
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => EventDetails(event),
+                  ),
+                ),
               ),
             ],
           ),
