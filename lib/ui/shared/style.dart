@@ -5,6 +5,7 @@ const Color secondary1 = Color.fromARGB(255, 254, 203, 46);
 const Color secondary2 = Color.fromARGB(255, 250, 7, 19);
 const Color grey = Color.fromARGB(255, 112, 112, 112);
 Color transGrey = grey.withOpacity(0.3);
+Color extraGrey = grey.withOpacity(0.1);
 const Color scaffoldColor = Color.fromARGB(255, 239, 247, 241);
 
 const Color kWhite = Colors.white;

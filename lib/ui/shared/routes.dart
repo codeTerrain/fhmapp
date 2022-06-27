@@ -9,5 +9,9 @@ class Routes {
   static const String events = '/events';
   static const String jobAid = '/jobAid';
   static const String faqs = '/faqs';
+  static const String schoolClinic = '/schoolClinic';
+  static const String medicalScreening = '/medicalScreening';
   static const String logout = '/logout';
+  static const String welcome = '/welcome';
+  static const String createPost = '/createPost';
 }

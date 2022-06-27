@@ -4,30 +4,36 @@ import 'package:fhmapp/ui/shared/style.dart';
 class CustomTextField extends StatefulWidget {
   final String hintText;
   final bool enabled;
+  final bool obscureText;
   final TextEditingController controller;
   final TextInputType keyboardType;
   final Color color;
-  final Function(String?)? onsaved;
-  final Function(String)? onChanged;
-  final String? Function(String?)? validation;
+  final FormFieldSetter<String>? onsaved;
+  final FormFieldSetter<String>? onChanged;
+  final FormFieldValidator<String>? validator;
   final int? maxLines;
   final double height;
   final double width;
   final Widget? prefixIcon;
+  final Color? borderColor;
+  final Widget? suffixIcon;
   const CustomTextField(
       {this.hintText = '',
       Key? key,
       required this.controller,
       this.keyboardType = TextInputType.text,
       this.onsaved,
+      this.obscureText = false,
       this.onChanged,
       this.enabled = true,
       this.color = kWhite,
       this.height = 40,
       this.width = 300,
       this.maxLines,
+      this.borderColor,
       this.prefixIcon,
-      this.validation})
+      this.suffixIcon,
+      this.validator})
       : super(key: key);
 
   @override
@@ -54,14 +60,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         enabled: widget.enabled,
         keyboardType: widget.keyboardType,
         controller: widget.controller,
-        obscureText: (widget.hintText == "Password" ||
-                widget.hintText == "Create New Password" ||
-                widget.hintText == "Re-type your Password" ||
-                widget.hintText == "Re-type New Password")
-            ? _obscureText
-            : false,
+        obscureText: widget.obscureText ? _obscureText : false,
         onSaved: widget.onsaved,
-        validator: widget.validation,
+        validator: widget.validator,
         decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle:
@@ -69,14 +70,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
             enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: primaryColor, width: 2.0),
             ),
+            disabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                  color: widget.borderColor ?? primaryColor, width: 2.0),
+            ),
             focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: secondary1, width: 2.0),
             ),
             prefixIcon: widget.prefixIcon,
-            suffixIcon: (widget.hintText == "Password" ||
-                    widget.hintText == "Create New Password" ||
-                    widget.hintText == "Re-type your Password" ||
-                    widget.hintText == "Re-type New Password")
+            suffixIconColor: grey,
+            suffixIconConstraints: const BoxConstraints(minWidth: 30),
+            suffixIcon: widget.obscureText
                 ? IconButton(
                     onPressed: () {
                       _toggle();
@@ -87,7 +91,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             : Icons.visibility,
                         color: _obscureText == true ? primaryColor : grey),
                   )
-                : null),
+                : widget.suffixIcon),
       ),
     );
   }

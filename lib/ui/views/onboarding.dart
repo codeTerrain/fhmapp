@@ -29,7 +29,7 @@ class _OnboardingState extends State<Onboarding> {
   Widget build(BuildContext context) {
     const pageDecoration = PageDecoration(
       titleTextStyle: TextStyle(
-          color: primaryColor, fontSize: 30.0, fontWeight: FontWeight.w900),
+          color: primaryColor, fontSize: 25.0, fontWeight: FontWeight.w900),
       bodyTextStyle: TextStyle(
           color: primaryColor, fontSize: 25.0, fontWeight: FontWeight.w700),
       imagePadding: EdgeInsets.zero,
@@ -53,7 +53,7 @@ class _OnboardingState extends State<Onboarding> {
                     child: RoundedButtonTheme(
                         text: 'Skip',
                         onPressed: () => Navigator.of(context)
-                            .push(createRoute(page: Login()))))),
+                            .push(createRoute(page: const Login()))))),
           ),
         ),
         pages: [
@@ -64,16 +64,16 @@ class _OnboardingState extends State<Onboarding> {
             decoration: pageDecoration,
           ),
           PageViewModel(
-            title: "Your baby's health, our concern",
-            body: " ",
-            image: _buildImage('maternal.png'),
+            title: "Healthy baby, Healthy Nation",
+            body: "We care for you",
+            image: _buildImage('midwives.png'),
             decoration: pageDecoration,
           ),
           PageViewModel(
-            title: "Good Food, Good Health",
+            title: "GHANA HEALTH SERVICE",
             body: "Your Health, Our concern",
             decoration: pageDecoration,
-            image: _buildImage('nutrition.png'),
+            image: _buildImage('workers.png'),
           ),
         ],
         onDone: () => _onIntroEnd(context),

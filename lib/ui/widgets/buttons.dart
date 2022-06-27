@@ -12,6 +12,7 @@ class RoundedButtonTheme extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final double height;
+  final bool isRounded;
   const RoundedButtonTheme(
       {required this.text,
       Key? key,
@@ -21,6 +22,7 @@ class RoundedButtonTheme extends StatelessWidget {
       required this.onPressed,
       this.buttonType = 'primary',
       this.textColor = kWhite,
+      this.isRounded = true,
       this.buttonColor = primaryColor,
       this.height = 40})
       : super(key: key);
@@ -45,18 +47,18 @@ class RoundedButtonTheme extends StatelessWidget {
                 ? UiSpacing.horizontalSpacingSmall()
                 : const SizedBox(),
             Center(
-              child: Text(text,
-                  style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                        color: buttonType == 'secondary'
-                            ? primaryColor
-                            : textColor,
-                      )
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                      color:
+                          buttonType == 'secondary' ? primaryColor : textColor,
+                    ),
 
-                  //  TextStyle(
-                  //   color: buttonType == 'secondary' ? primaryColor : textColor,
-                  //   fontSize:
-                  // ),
-                  ),
+                //  TextStyle(
+                //   color: buttonType == 'secondary' ? primaryColor : textColor,
+                //   fontSize:
+                // ),
+              ),
             ),
             trailing != null ? UiSpacing.horizontalSpacingSmall() : Container(),
             trailing ?? Container()
@@ -67,8 +69,8 @@ class RoundedButtonTheme extends StatelessWidget {
       decoration: buttonType == 'secondary'
           ? BoxDecoration(
               border: Border.all(color: primaryColor, width: 2),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(30.0),
+              borderRadius: BorderRadius.all(
+                Radius.circular(isRounded ? 30.0 : 0),
               ),
               color: kWhite)
           : BoxDecoration(
@@ -76,8 +78,8 @@ class RoundedButtonTheme extends StatelessWidget {
                 color: primaryColor,
                 width: 0,
               ),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(30.0),
+              borderRadius: BorderRadius.all(
+                Radius.circular(isRounded ? 30.0 : 10),
               ),
               color: buttonColor),
       width: width,

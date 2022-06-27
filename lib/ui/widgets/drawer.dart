@@ -22,12 +22,18 @@ class CustomDrawer extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           separatorBuilder: (context, index) => const SizedBox(height: 30),
-          itemCount: 5,
-          itemBuilder: (context, index) => Center(
-            child: Text(
-              drawerItems.keys.toList()[index],
-              style:
-                  Theme.of(context).textTheme.headline5?.copyWith(fontSize: 15),
+          itemCount: 6,
+          itemBuilder: (context, index) => GestureDetector(
+            onTap: () => Navigator.pushNamed(
+                context, drawerItems.values.toList()[index]),
+            child: Center(
+              child: Text(
+                drawerItems.keys.toList()[index],
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5
+                    ?.copyWith(fontSize: 15),
+              ),
             ),
           ),
         )

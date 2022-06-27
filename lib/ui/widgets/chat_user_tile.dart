@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../shared/static_lists.dart';
+import '../../core/model/chat_item_model.dart';
 import '../shared/style.dart';
 import 'misc.dart';
 
-class ProgramTile extends StatelessWidget {
+class ChatUserTile extends StatelessWidget {
   final int index;
+  final ChatItemModel chatItem;
   final GestureTapCallback? onTap;
   final Widget? trailing;
-  const ProgramTile(this.index, {Key? key, this.onTap, this.trailing})
+  const ChatUserTile(this.index, this.chatItem,
+      {Key? key, this.onTap, this.trailing})
       : super(key: key);
 
   @override
@@ -18,12 +20,15 @@ class ProgramTile extends StatelessWidget {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         tileColor: kWhite,
-        leading: Image.asset(
-          'assets/images/logos/ghs_logo.png',
-          scale: 3,
+        leading: const CircleAvatar(
+          child: Icon(
+            Icons.person,
+            color: kWhite,
+          ),
+          backgroundColor: primaryColor,
         ),
         title: Text(
-          programs.values.toList()[index],
+          chatItem.chatUserName ?? 'User $index',
           style: Theme.of(context).textTheme.bodyText1?.copyWith(color: grey),
         ),
         trailing: trailing,
