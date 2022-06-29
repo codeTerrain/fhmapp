@@ -32,12 +32,12 @@ class _CourseViewState extends State<CourseView> {
             }),
             onPageFinished: (loadedPageUrl) async {
               if (loadedPageUrl ==
-                  'http://ghsvirtualplatform.com/login/index.php') {
+                  'http://ghsvirtualplatform.com/login/index') {
                 controller.runJavascript(
                     "document.getElementById('username').value='${model.elearnUsername}'");
                 controller.runJavascript(
                     "document.getElementById('password').value='${model.elearnPassword}'");
-                await Future.delayed(const Duration(seconds: 1));
+                await Future.delayed(const Duration(seconds: 2));
                 await controller.runJavascript("document.forms[1].submit()");
               }
             },

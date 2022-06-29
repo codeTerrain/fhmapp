@@ -59,6 +59,7 @@ dependencies:
   cloud_firestore: ^3.1.13
   firebase_messaging: ^11.2.14
   firebase_storage: ^10.2.13
+  persistent_bottom_nav_bar: ^4.0.2
   intl: ^0.17.0
 
   path_provider: ^2.0.9
@@ -101,6 +102,7 @@ flutter:
     - assets/images/logos/
     - assets/images/general/
     - assets/images/profile/
+    - assets/images/programs/
 
       #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

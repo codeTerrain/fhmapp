@@ -19,7 +19,7 @@ class ResourceService extends BaseViewModel {
   final List<Resource> _resources = [];
   List<Resource> get resources => _resources;
   static const String source =
-      r'.docx|.svg|.doc|.txt|.pptx|.html|.jpeg|.jpg|.png|.gif|.pdf|.xlsx|.ppt|.tiff|.mp4|.mpeg|.webm|.mov|.avi|.wmv|.flv|.mkv|.mp3|.wav|.ogg|.wma|.aac';
+      r'.docx|.svg|.doc|.txt|.pptx|.html|.jpeg|.jpg|.png|.gif|.pdf|.xlsx|.ppt|.tiff|.mp4|.mpeg|.webm|.mov|.avi|.wmv|.flv|.mkv|.mp3|.wav|.ogg|.wma|.aac|.csv';
 
   static String getFileName(Reference file) {
     String fileName = file.name.splitMapJoin(
@@ -83,9 +83,10 @@ class ResourceService extends BaseViewModel {
       List<DocumentSnapshot> docs = onlineResources.docs;
 
       for (var doc in docs) {
-        bool? docContainsKey = await _sharedPrefs.containsKey(doc['id']);
+        bool? docContainsKey =
+            await _sharedPrefs.containsKey(doc['id'].toString());
         if (docContainsKey is bool) {
-          print(await _sharedPrefs.getLocalStorage('2'));
+          //  print(await _sharedPrefs.getLocalStorage(doc['id'].toString()));
           if (!docContainsKey) {
             //     print(doc['id']);
             Map<String, Object> data = {
@@ -115,5 +116,32 @@ class ResourceService extends BaseViewModel {
 
       notifyListeners();
     }
+  }
+
+  static Future<void> deleteFile(File file) async {
+    try {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      // Error in getting access to the file.
+    }
+  }
+
+  Future updateResourceDownloads({required Resource resource}) async {
+    Set<String> updatedDownloadList = {};
+    final String currentUserEmail = await _sharedPrefs.getLocalStorage('email');
+    print(resource.downloadedUsers);
+
+    if (resource.downloadedUsers != null) {
+      updatedDownloadList = resource.downloadedUsers!.toSet().cast<String>();
+    }
+
+    updatedDownloadList.add(currentUserEmail);
+
+    _respository.updateResourceDownloads(
+        id: resource.id,
+        email: currentUserEmail,
+        updatedDownloadList: updatedDownloadList);
   }
 }

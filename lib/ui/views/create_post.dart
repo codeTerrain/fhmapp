@@ -10,7 +10,6 @@ import 'package:stacked/stacked.dart';
 import '../viewmodels/post_view_model.dart';
 import '../widgets/appbars.dart';
 import '../widgets/change_info.dart';
-import '../widgets/drop_down.dart';
 import '../widgets/misc.dart';
 import '../widgets/neumorph_drop_down.dart';
 import '../widgets/neumorph_textfield.dart';

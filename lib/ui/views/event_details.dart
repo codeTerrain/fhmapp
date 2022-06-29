@@ -40,6 +40,8 @@ class EventDetails extends StatelessWidget {
                 CachedImage(
                   image: event.image,
                   margin: EdgeInsets.zero,
+                  borderRadius1: BorderRadius.zero,
+                  borderRadius2: BorderRadius.zero,
                 ),
                 // SizedBox(
                 //     width: UiSpacing.screenSize(context).width,
@@ -215,12 +217,12 @@ class EventDetails extends StatelessWidget {
                                 alignment: Alignment.bottomCenter,
                                 children: [
                                   SizedBox(
-                                    width: 200,
-                                    height: 400,
+                                    width: 220,
+                                    height: 200,
                                     child: FittedBox(
+                                      fit: BoxFit.fitHeight,
                                       child: CachedImage(
                                         image: events[index].image,
-                                        fit: BoxFit.fitWidth,
                                         margin: EdgeInsets.zero,
                                       ),
                                       //  Image.asset(
@@ -249,10 +251,7 @@ class EventDetails extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            event.startDate == null
-                                                ? ''
-                                                : eventDateFormat(
-                                                    event.startDate),
+                                            eventDateFormat(event.startDate),
                                             //  text: 'THU, 13th JUN, 2022\n',
                                             style: Theme.of(context)
                                                 .textTheme
@@ -277,7 +276,13 @@ class EventDetails extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            onTap: null);
+                            onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        EventDetails(events[index]),
+                                  ),
+                                ));
                       },
                     ),
                   );

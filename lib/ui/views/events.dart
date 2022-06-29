@@ -203,7 +203,9 @@ class EventCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CachedImage(image: event.image),
+              ClipRRect(
+                  borderRadius: generalBorderRadius,
+                  child: CachedImage(image: event.image)),
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: RichText(

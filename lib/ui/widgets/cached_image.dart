@@ -6,16 +6,22 @@ import '../shared/style.dart';
 import 'misc.dart';
 
 class CachedImage extends StatelessWidget {
-  const CachedImage({
-    Key? key,
-    required this.image,
-    this.fit = BoxFit.fitWidth,
-    this.margin = const EdgeInsets.symmetric(horizontal: 12),
-  }) : super(key: key);
+  const CachedImage(
+      {Key? key,
+      required this.image,
+      this.fit = BoxFit.fitWidth,
+      this.margin = const EdgeInsets.symmetric(horizontal: 12),
+      this.borderRadius1 = const BorderRadius.vertical(
+        top: Radius.circular(10),
+      ),
+      this.borderRadius2})
+      : super(key: key);
 
   final String? image;
   final BoxFit? fit;
   final EdgeInsetsGeometry? margin;
+  final BorderRadius? borderRadius1;
+  final BorderRadius? borderRadius2;
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +29,12 @@ class CachedImage extends StatelessWidget {
       width: UiSpacing.screenSize(context).width,
       height: 200,
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(10),
-        ),
+        borderRadius: borderRadius1,
         child: (image != null)
             ? Container(
                 margin: margin,
                 child: ClipRRect(
-                  borderRadius: generalBorderRadius,
+                  borderRadius: borderRadius2 ?? generalBorderRadius,
                   child: CachedNetworkImage(
                     imageUrl: image!,
                     fit: fit,

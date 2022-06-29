@@ -278,6 +278,16 @@ class Respository {
     return qs.docs.first;
   }
 
+  Future<QueryDocumentSnapshot> getSingleResource(String id) async {
+    QuerySnapshot qs = await _db
+        .collection('resources')
+        .where('id', isEqualTo: id)
+        .limit(1)
+        .get();
+
+    return qs.docs.first;
+  }
+
   updateLikes({
     required String postId,
     required String email,
@@ -319,5 +329,27 @@ class Respository {
       distinctAttendees = updatedAtendees.toList();
     }
     eventDocRef.update({'registeredUsers': distinctAttendees});
+  }
+
+  updateResourceDownloads({
+    required String id,
+    required String email,
+    required Set<String> updatedDownloadList,
+  }) async {
+    var resourceDoc = await getSingleResource(id);
+    DocumentReference resourceDocRef = resourceDoc.reference;
+    List<String>? distinctDownloads;
+    // print(updatedLikes);
+    if (!updatedDownloadList.contains(email)) {
+      List<String> onlineRegisteredUsers =
+          List<String>.from(resourceDoc['distinctDownloads']);
+
+      onlineRegisteredUsers.remove(email);
+
+      distinctDownloads = onlineRegisteredUsers.toSet().toList();
+    } else {
+      distinctDownloads = updatedDownloadList.toList();
+    }
+    resourceDocRef.update({'downloadedUsers': distinctDownloads});
   }
 }

@@ -59,6 +59,7 @@ class _ChatCategoryState extends State<ChatCategory> {
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ProgramTile(
                           index,
+                          id: programs.keys.toList()[index],
                           text: programs.values.toList()[index],
                           trailing: model.user.userType != 'nationalRep'
                               ? NotificationCount(

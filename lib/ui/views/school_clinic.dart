@@ -30,7 +30,7 @@ class SchoolClinic extends StatelessWidget {
                   return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ProgramTile(
-                        index,
+                        index, id: programs.keys.toList()[index],
                         text: schoolClinic.values.toList()[index],
                         onTap: () => null,
                         // Navigator.push(

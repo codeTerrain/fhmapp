@@ -7,11 +7,16 @@ import 'misc.dart';
 
 class ProgramTile extends StatelessWidget {
   final int index;
+  final String id;
   final GestureTapCallback? onTap;
   final Widget? trailing;
   final String text;
   const ProgramTile(this.index,
-      {Key? key, required this.text, this.onTap, this.trailing})
+      {Key? key,
+      required this.id,
+      required this.text,
+      this.onTap,
+      this.trailing})
       : super(key: key);
 
   @override
@@ -21,8 +26,8 @@ class ProgramTile extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
         tileColor: kWhite,
         leading: Image.asset(
-          'assets/images/logos/ghs_logo.png',
-          scale: 8,
+          'assets/images/programs/$id.png',
+          scale: 2.5,
         ),
         horizontalTitleGap: 10,
         title: Text(

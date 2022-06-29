@@ -8,13 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:open_file/open_file.dart';
 import 'package:stacked/stacked.dart';
-
 import '../../core/model/resource_model.dart';
 import '../../core/services/respository.dart';
 import '../../core/services/shared_preferences.dart';
 import '../../locator.dart';
 import '../shared/style.dart';
+import '../viewmodels/profile_view_model.dart';
 import '../widgets/misc.dart';
+import 'create_resource.dart';
 
 class Resources extends StatelessWidget {
   final String categoryKey;
@@ -41,6 +42,19 @@ class Resources extends StatelessWidget {
                   .bodyText1
                   ?.copyWith(color: primaryColor),
             ),
+            trailing: ViewModelBuilder<ProfileViewModel>.reactive(
+                viewModelBuilder: () => ProfileViewModel(),
+                onModelReady: (model) => model.getUserInfo(),
+                builder: (context, model, child) {
+                  if (model.isBusy) {
+                    return const SizedBox();
+                  }
+                  return (model.user.fhmappAdminFor != null &&
+                          model.user.fhmappAdminFor!.contains(categoryValue))
+                      ? newPostCaller(context, model.user.fhmappAdminFor,
+                          CreateResource(fhmappAdminCategory: categoryKey))
+                      : const SizedBox();
+                }),
           ),
           ViewModelBuilder<ResourceService>.reactive(
               viewModelBuilder: () => ResourceService(),
@@ -77,7 +91,6 @@ class ResourceTile extends StatelessWidget {
           shape: roundedListTileBorder,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-          // contentPadding: ,
           tileColor: kWhite,
           leading: Image.asset(
             'assets/images/logos/ghs_logo.png',
@@ -106,7 +119,9 @@ class Downloader extends StatefulWidget {
 
 class _DownloaderState extends State<Downloader> {
   late String _downloadProgress;
+  late bool isRemote;
   final SharedPrefs _sharedPrefs = locator<SharedPrefs>();
+  final Respository _respository = locator<Respository>();
 
   downloadResource(BuildContext context, Resource resource) async {
     var dio = Dio();
@@ -124,36 +139,42 @@ class _DownloaderState extends State<Downloader> {
       } else {
         String url = resource.path;
 
-        await dio
-            .download(
-              url,
-              fullpath,
-              onReceiveProgress: (received, total) {
-                if (total != -1) {
-                  setState(() {
-                    _downloadProgress =
-                        (received / total * 100).toStringAsFixed(0) + "%";
-                  });
-                }
-              },
-            )
-            .then((value) async =>
-                await _sharedPrefs.setLocalStorage(resource.id!, resource.name))
-            .onError((e, s) {
-              print(e);
-              return;
-            });
+        await dio.download(
+          url,
+          fullpath,
+          onReceiveProgress: (received, total) {
+            if (total != -1) {
+              if (mounted) {
+                setState(() {
+                  _downloadProgress =
+                      (received / total * 100).toStringAsFixed(0) + "%";
+                });
+              }
+            }
+          },
+        ).then((value) async {
+          await _sharedPrefs.setLocalStorage(resource.id, resource.name);
+          await ResourceService().updateResourceDownloads(resource: resource);
+        }).onError((e, s) {
+          print(e);
+          ResourceService.deleteFile(downloadedResource);
+          return;
+        });
+        if (mounted) {
+          setState(() {
+            isRemote = false;
+            _downloadProgress = widget.resource.extension;
+          });
+        }
 
         OpenFile.open(fullpath);
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text(' File Downloaded')));
       }
     } catch (e) {
-      print(e);
-      // _dialogService.showDialog(
-      //     title: '  Error',
-      //     description:
-      //         'An error occurred while downloading the file. Please try again later. Thank you.');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'An error occurred while downloading the file. Please try again later. Thank you.')));
     }
   }
 
@@ -161,6 +182,7 @@ class _DownloaderState extends State<Downloader> {
   void initState() {
     super.initState();
     _downloadProgress = widget.resource.extension;
+    isRemote = widget.resource.isRemote;
   }
 
   @override
@@ -187,7 +209,7 @@ class _DownloaderState extends State<Downloader> {
           ],
         ),
         decoration: BoxDecoration(
-            color: widget.resource.isRemote ? primaryColor : secondary1,
+            color: isRemote ? primaryColor : secondary1,
             borderRadius: BorderRadius.circular(15)),
       ),
     );

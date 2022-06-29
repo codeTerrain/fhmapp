@@ -50,6 +50,7 @@ class _ResourcesCategoryState extends State<ResourcesCategory> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: ProgramTile(
                       index,
+                      id: programs.keys.toList()[index],
                       text: programs.values.toList()[index],
                       onTap: () => Navigator.push(
                         context,

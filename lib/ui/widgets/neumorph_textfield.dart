@@ -20,6 +20,7 @@ class NeumorphTextField extends StatefulWidget {
   final double height;
   final double width;
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   const NeumorphTextField(
       {this.hintText = '',
       Key? key,
@@ -37,6 +38,7 @@ class NeumorphTextField extends StatefulWidget {
       this.maxLines,
       this.minLines,
       this.prefixIcon,
+      this.suffixIcon,
       this.validator})
       : super(key: key);
 
@@ -97,7 +99,7 @@ class _NeumorphTextFieldState extends State<NeumorphTextField> {
                             : Icons.visibility,
                         color: _obscureText == true ? primaryColor : grey),
                   )
-                : null),
+                : widget.suffixIcon),
       ),
     );
   }

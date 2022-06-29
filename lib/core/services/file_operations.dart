@@ -13,12 +13,12 @@ class FileOperations {
   //   }
   // }
 
-  static Future uploadFile(String destination, File imageFile) async {
+  static Future uploadFile(String destination, File file) async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     Reference reference =
         FirebaseStorage.instance.ref(destination).child(fileName);
 
-    TaskSnapshot uploadTask = await reference.putFile(imageFile);
+    TaskSnapshot uploadTask = await reference.putFile(file);
 
     String url = await uploadTask.ref.getDownloadURL();
 
